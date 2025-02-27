@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "blocks",
+  "pattern": [
+    "A A",
+    "A A",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "pasturecollector:iron_slab"
+    }
+  },
+  "result": {
+    "item": "pasturecollector:pasture_collector",
+    "count": 1
+  }
+}
