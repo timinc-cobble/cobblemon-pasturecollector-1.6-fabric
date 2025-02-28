@@ -28,6 +28,10 @@ dependencies {
 
     // Cobblemon
     modImplementation("com.cobblemon:fabric:${property("cobblemon_version")}")
+
+    // Drop Loot Tables
+    // TODO: Remove this in favor of Modrinth Maven.
+    modImplementation(files("libs/cobblemon-droploottables-1.6-fabric-1.0.0-dev.jar"))
 }
 
 tasks {

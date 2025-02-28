@@ -8,6 +8,7 @@ import us.timinc.mc.cobblemon.pasturecollector.api.PastureCollectorConfig
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
+import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntities
 
 object PastureCollector : ModInitializer {
     const val MOD_ID = "pasturecollector"
@@ -16,6 +17,7 @@ object PastureCollector : ModInitializer {
 
     override fun onInitialize() {
         config = ConfigBuilder.load(PastureCollectorConfig::class.java, "cobblemon/tim/PastureCollector")
+        PastureCollectorBlockEntities.register()
         PastureCollectorBlocks.register()
 
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { _, _, _ ->
