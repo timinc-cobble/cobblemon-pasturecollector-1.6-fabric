@@ -85,7 +85,13 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
 
     override fun stillValid(player: Player): Boolean = Container.stillValidBlockEntity(this, player)
 
-    override fun getSlotsForFace(direction: Direction): IntArray = IntArray(0)
+    override fun getSlotsForFace(side: Direction): IntArray {
+        val result = IntArray(inventory.size)
+        for (i in result.indices) {
+            result[i] = i
+        }
+        return result
+    }
 
     override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
 
