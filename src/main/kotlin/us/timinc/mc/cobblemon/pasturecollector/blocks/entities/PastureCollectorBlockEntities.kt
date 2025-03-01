@@ -3,7 +3,7 @@ package us.timinc.mc.cobblemon.pasturecollector.blocks.entities
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.entity.BlockEntityType
-import us.timinc.mc.cobblemon.pasturecollector.PastureCollector.modIdentifier
+import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod.modIdentifier
 import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
 
 object PastureCollectorBlockEntities {

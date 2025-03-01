@@ -11,7 +11,13 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "us.timinc.mc.cobblemon.pasturecollector.PastureCollector"
+        "value": "us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod"
+      }
+    ],
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "us.timinc.mc.cobblemon.pasturecollector.PastureCollectorModClient"
       }
     ]
   },

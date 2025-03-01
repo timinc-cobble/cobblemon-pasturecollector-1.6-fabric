@@ -8,13 +8,16 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BaseEntityBlock
+import net.minecraft.world.level.block.LecternBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.VoxelShape
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
@@ -40,7 +43,15 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
             PastureCollectorBlockEntity.Companion.DropResult.PARTIAL -> ParticleTypes.CAMPFIRE_COSY_SMOKE
             PastureCollectorBlockEntity.Companion.DropResult.FULL -> ParticleTypes.COMPOSTER
         }
-        particle?.let { level.sendParticlesServer(it, pos.center.add(Vec3(0.0, 0.65, 0.0)), 3, Vec3(0.0, 0.1, 0.0), 0.0) }
+        particle?.let {
+            level.sendParticlesServer(
+                it,
+                pos.center.add(Vec3(0.0, 0.65, 0.0)),
+                3,
+                Vec3(0.0, 0.1, 0.0),
+                0.0
+            )
+        }
     }
 
     override fun useWithoutItem(
@@ -55,6 +66,9 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
     }
 
     override fun getRenderShape(blockState: BlockState): RenderShape = RenderShape.MODEL
+
+    override fun getOcclusionShape(blockState: BlockState, blockGetter: BlockGetter, blockPos: BlockPos): VoxelShape? =
+        LecternBlock.SHAPE_COMMON
 
     override fun isRandomlyTicking(blockState: BlockState): Boolean = true
 

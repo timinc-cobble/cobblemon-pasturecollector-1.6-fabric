@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger
 import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntities
 
-object PastureCollector : ModInitializer {
+object PastureCollectorMod : ModInitializer {
     const val MOD_ID = "pasturecollector"
     lateinit var config: PastureCollectorConfig
     val logger: Logger = LogManager.getLogger(MOD_ID)

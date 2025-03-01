@@ -6,7 +6,7 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
-import us.timinc.mc.cobblemon.pasturecollector.PastureCollector.modIdentifier
+import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod.modIdentifier
 
 object PastureCollectorBlocks {
     val PASTURE_COLLECTOR = PastureCollectorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE))
