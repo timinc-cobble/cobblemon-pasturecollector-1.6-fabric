@@ -14,7 +14,8 @@ object PastureCollectorBlockEntities {
             Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
                 modIdentifier("pasture_collector_entity"),
-                BlockEntityType.Builder.of(::PastureCollectorBlockEntity, PastureCollectorBlocks.PASTURE_COLLECTOR).build()
+                BlockEntityType.Builder.of(::PastureCollectorBlockEntity, PastureCollectorBlocks.PASTURE_COLLECTOR)
+                    .build()
             )
     }
 }

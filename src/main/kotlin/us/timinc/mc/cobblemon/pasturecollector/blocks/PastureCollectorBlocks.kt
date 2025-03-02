@@ -1,5 +1,7 @@
 package us.timinc.mc.cobblemon.pasturecollector.blocks
 
+import com.cobblemon.mod.common.item.group.CobblemonItemGroups
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.BlockItem
@@ -18,5 +20,8 @@ object PastureCollectorBlocks {
         Registry.register(
             BuiltInRegistries.ITEM, modIdentifier("pasture_collector"), BlockItem(PASTURE_COLLECTOR, Item.Properties())
         )
+        ItemGroupEvents.modifyEntriesEvent(CobblemonItemGroups.BLOCKS_KEY).register {
+            it.accept(PASTURE_COLLECTOR)
+        }
     }
 }
