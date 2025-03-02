@@ -1,5 +1,5 @@
 package us.timinc.mc.cobblemon.pasturecollector.api
 
-open class Config {
+open class PastureCollectorConfig {
     val debug: Boolean = false
 }
