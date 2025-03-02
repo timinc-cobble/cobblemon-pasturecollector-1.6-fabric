@@ -4,7 +4,9 @@
   "version": "1.6-fabric-1.0.0",
   "name": "Cobblemon Pasture Collector",
   "description": "Collects items from Pokemon in nearby Pasture Blocks in Cobblemon.",
-  "authors": ["TimInc aka Timothy Metcalfe"],
+  "authors": [
+    "TimInc aka Timothy Metcalfe"
+  ],
   "license": "MIT",
   "environment": "*",
   "entrypoints": {

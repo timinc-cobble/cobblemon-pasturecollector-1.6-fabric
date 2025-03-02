@@ -3,10 +3,10 @@ package us.timinc.mc.cobblemon.pasturecollector
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.ResourceLocation
-import us.timinc.mc.cobblemon.pasturecollector.api.ConfigBuilder
-import us.timinc.mc.cobblemon.pasturecollector.api.PastureCollectorConfig
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import us.timinc.mc.cobblemon.pasturecollector.api.ConfigBuilder
+import us.timinc.mc.cobblemon.pasturecollector.api.PastureCollectorConfig
 import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntities
 

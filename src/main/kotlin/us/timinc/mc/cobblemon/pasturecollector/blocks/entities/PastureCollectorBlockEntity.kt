@@ -66,7 +66,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
 
     override fun getItem(i: Int): ItemStack = inventory[i]
 
-    override fun removeItem(i: Int, j: Int): ItemStack = ContainerHelper.removeItem(inventory, i, j);
+    override fun removeItem(i: Int, j: Int): ItemStack = ContainerHelper.removeItem(inventory, i, j)
 
     override fun removeItemNoUpdate(i: Int): ItemStack {
         if (inventory[i].isEmpty) return ItemStack.EMPTY

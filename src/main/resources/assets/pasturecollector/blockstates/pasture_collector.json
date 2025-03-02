@@ -1,5 +1,7 @@
 {
   "variants": {
-    "": { "model": "pasturecollector:block/pasture_collector" }
+    "": {
+      "model": "pasturecollector:block/pasture_collector"
+    }
   }
 }
