@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
+import net.minecraft.world.Containers
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.BlockGetter
@@ -76,5 +77,16 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         val blockEntity = level.getBlockEntity(pos)
         if (blockEntity !is PastureCollectorBlockEntity) throw Error("Tried to get an entity for a Pasture Block, but it wasn't a Pasture Block Entity.")
         return blockEntity
+    }
+
+    override fun onRemove(
+        state: BlockState,
+        world: Level,
+        pos: BlockPos,
+        newState: BlockState,
+        moved: Boolean,
+    ) {
+        Containers.dropContentsOnDestroy(state, newState, world, pos)
+        super.onRemove(state, world, pos, newState, moved)
     }
 }
