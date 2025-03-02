@@ -27,6 +27,7 @@
     "fabricloader": ">=0.16.9",
     "fabric-language-kotlin": ">=1.9.3+kotlin.1.8.20",
     "fabric": "*",
-    "cobblemon": ">=1.6.1"
+    "cobblemon": ">=1.6.1",
+    "cobblemon_droploottables": ">=1.6-fabric-1.1.0"
   }
 }
