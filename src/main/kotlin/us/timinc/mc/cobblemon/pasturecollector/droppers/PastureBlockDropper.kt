@@ -2,12 +2,10 @@ package us.timinc.mc.cobblemon.pasturecollector.droppers
 
 import com.cobblemon.mod.common.api.drop.ItemDropEntry
 import com.cobblemon.mod.common.util.itemRegistry
-import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.storage.loot.LootParams
 import us.timinc.mc.cobblemon.droploottables.api.droppers.AbstractFormDropper
 import us.timinc.mc.cobblemon.droploottables.api.droppers.FormDropContext
-import us.timinc.mc.cobblemon.droploottables.dropentries.DynamicItemDropEntry
 import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod.MOD_ID
 
 object PastureBlockDropper : AbstractFormDropper("collector", MOD_ID) {
