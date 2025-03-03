@@ -19,13 +19,15 @@ object PastureBlockDropper : AbstractFormDropper("collector", MOD_ID) {
 
         // Calculated drops for current moment
         // Generates anew each call
-        context.formData.drops.getDrops().forEach {
+        context.formData.drops.getDrops()
             // It can be anything, but we need items, so we check it here
-            if (it is ItemDropEntry) {
+            .filterIsInstance<ItemDropEntry>()
+            // We don't want to miss on other loot entries except first in list, so we pick one random from it
+            .random()
+            .let {
                 val itemStack = registry.get(it.item)?.defaultInstance ?: ItemStack.EMPTY
                 loot.add(itemStack)
             }
-        }
 
         return loot
     }
