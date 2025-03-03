@@ -20,9 +20,9 @@ object PastureBlockDropper : AbstractFormDropper("collector", MOD_ID) {
         val registry = params.level.itemRegistry
 
         // Calculated drops for current moment
-        // see https://gitlab.com/cable-mc/cobblemon/-/blob/main/common/src/main/kotlin/com/cobblemon/mod/common/api/drop/DropTable.kt?ref_type=heads#L50
+        // Generates anew each call
         context.formData.drops.getDrops().forEach {
-            // See https://gitlab.com/cable-mc/cobblemon/-/blob/main/common/src/main/kotlin/com/cobblemon/mod/common/api/pokedex/filter/SearchFilter.kt#L55
+            // It can be anything, but we need items, so we check it here
             if (it is ItemDropEntry) {
                 val itemStack = registry.get(it.item)?.defaultInstance ?: ItemStack.EMPTY
                 loot.add(itemStack)
