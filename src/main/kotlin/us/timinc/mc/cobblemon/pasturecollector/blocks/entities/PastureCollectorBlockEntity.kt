@@ -136,7 +136,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         )
         val drops = PastureBlockDropper.getDrops(lootParams, FormDropContext(chosenMon.form)).toMutableList()
 
-        if (!PastureBlockDropper.lootTableExists(level, PastureBlockDropper.getFormDropId(chosenMon.form))) {
+        if (PastureCollectorMod.config.baseCobblemonLootEnabled && !PastureBlockDropper.lootTableExists(level, PastureBlockDropper.getFormDropId(chosenMon.form))) {
             val baseDrops = chosenMon.form.drops.getDrops(pokemon = chosenMon)
             drops.addAll(baseDrops.mapNotNull { drop ->
                 if (drop is ItemDropEntry) {
