@@ -87,7 +87,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
 
     override fun getSlotsForFace(side: Direction): IntArray {
         val result = IntArray(inventory.size)
-        for (i in result) {
+        for (i in result.indices) {
             result[i] = i
         }
         return result
