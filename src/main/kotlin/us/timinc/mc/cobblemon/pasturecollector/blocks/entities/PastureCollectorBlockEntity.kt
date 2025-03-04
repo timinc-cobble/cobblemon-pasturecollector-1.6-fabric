@@ -87,7 +87,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
 
     override fun getSlotsForFace(side: Direction): IntArray {
         val result = IntArray(inventory.size)
-        for (i in result.indices) {
+        for (i in result) {
             result[i] = i
         }
         return result
@@ -113,15 +113,13 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
             level,
             pos
         ).flatMap { pasture ->
-            pasture.tetheredPokemon.mapNotNull { it.getPokemon() }
-                .filter {
-                    it.entity != null && PastureBlockDropper.lootTableExists(
-                        level,
-                        PastureBlockDropper.getFormDropId(it.form)
-                    )
-                }
+            pasture
+                .tetheredPokemon
+                .mapNotNull { it.getPokemon() }
+                .filter {it.entity != null}
         }.randomOrNull() ?: return DropResult.NO_DROP
 
+        val lootTableExists = PastureBlockDropper.lootTableExists(level, PastureBlockDropper.getFormDropId(chosenMon.form))
         val lootParams = LootParams(
             level,
             mapOf(
@@ -134,7 +132,8 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
             mapOf(),
             0F
         )
-        val drops = PastureBlockDropper.getDrops(lootParams, FormDropContext(chosenMon.form))
+
+        val drops = PastureBlockDropper.getDrops(lootParams, FormDropContext(chosenMon.form), lootTableExists)
         if (!drops.any { !it.isEmpty }) return DropResult.NO_DROP
 
         var didAnyDrop = false
