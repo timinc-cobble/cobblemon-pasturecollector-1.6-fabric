@@ -1,4 +1,4 @@
-package us.timinc.mc.cobblemon.pasturecollector.api
+package us.timinc.mc.cobblemon.pasturecollector.config
 
 import com.google.gson.GsonBuilder
 import java.io.File
