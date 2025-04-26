@@ -66,7 +66,7 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         blockState: BlockState,
         blockGetter: BlockGetter,
         blockPos: BlockPos,
-        collisionContext: CollisionContext
+        collisionContext: CollisionContext,
     ): VoxelShape = SHAPE
 
     override fun randomTick(
