@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "cobblemon_pasturecollector",
-  "version": "1.6-fabric-1.1.0",
+  "version": "1.6-fabric-1.1.1",
   "name": "Cobblemon Pasture Collector",
   "description": "Collects items from Pokemon in nearby Pasture Blocks in Cobblemon.",
   "authors": [

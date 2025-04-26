@@ -12,24 +12,62 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BaseEntityBlock
-import net.minecraft.world.level.block.LecternBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
+import us.timinc.mc.cobblemon.pasturecollector.extensions.Shapes16
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
     companion object {
         val CODEC = simpleCodec(::PastureCollectorBlock)
+
+        val SHAPE = Shapes.or(
+            Shapes16.box(
+                0, 0, 0,
+                16, 12, 16
+            ),
+
+            Shapes16.box(
+                0, 12, 0,
+                2, 14, 2
+            ),
+            Shapes16.box(
+                14, 12, 0,
+                16, 14, 2
+            ),
+            Shapes16.box(
+                0, 12, 14,
+                2, 14, 16
+            ),
+            Shapes16.box(
+                14, 12, 14,
+                16, 14, 16
+            ),
+
+            Shapes16.box(
+                0, 14, 0,
+                16, 16, 16
+            ),
+        )
     }
 
     override fun codec(): MapCodec<out PastureCollectorBlock> = CODEC
 
     override fun newBlockEntity(blockPos: BlockPos, blockState: BlockState): BlockEntity =
         PastureCollectorBlockEntity(blockPos, blockState)
+
+    override fun getShape(
+        blockState: BlockState,
+        blockGetter: BlockGetter,
+        blockPos: BlockPos,
+        collisionContext: CollisionContext,
+    ): VoxelShape = SHAPE
 
     override fun randomTick(
         state: BlockState,
@@ -67,9 +105,6 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
     }
 
     override fun getRenderShape(blockState: BlockState): RenderShape = RenderShape.MODEL
-
-    override fun getOcclusionShape(blockState: BlockState, blockGetter: BlockGetter, blockPos: BlockPos): VoxelShape? =
-        LecternBlock.SHAPE_COMMON
 
     override fun isRandomlyTicking(blockState: BlockState): Boolean = true
 
