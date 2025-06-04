@@ -23,7 +23,6 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod.config
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
 import us.timinc.mc.cobblemon.pasturecollector.extensions.Shapes16
-import kotlin.random.Random
 import kotlin.random.Random.Default.nextFloat
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
