@@ -20,8 +20,10 @@ import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
+import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod.config
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
 import us.timinc.mc.cobblemon.pasturecollector.extensions.Shapes16
+import kotlin.random.Random.Default.nextFloat
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
     companion object {
@@ -76,6 +78,7 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         random: RandomSource,
     ) {
         super.randomTick(state, level, pos, random)
+        if (nextFloat() >= config.chanceToDrop) return
         val particle = when (getBlockEntity(pos, level).attemptToGetDrop(level, pos)) {
             PastureCollectorBlockEntity.Companion.DropResult.NO_DROP -> null
             PastureCollectorBlockEntity.Companion.DropResult.NONE -> ParticleTypes.CAMPFIRE_COSY_SMOKE
