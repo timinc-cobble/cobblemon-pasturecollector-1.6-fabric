@@ -3,6 +3,7 @@ package us.timinc.mc.cobblemon.pasturecollector.inventory
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.ContainerLevelAccess
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
@@ -36,7 +37,7 @@ class PastureCollectorMenu(
     }
 
     // Prevent dragging items into empty block inventory slots
-    override fun canDragTo(slot: Slot): Boolean = false
+    override fun canDragTo(slot: Slot): Boolean = slot.container is Inventory
 
     // Prevent dragging items into empty block inventory slots
     override fun canTakeItemForPickAll(itemStack: ItemStack, slot: Slot): Boolean = slot.container is Inventory
@@ -65,6 +66,18 @@ class PastureCollectorMenu(
         }
 
         return stack
+    }
+
+    override fun clicked(index: Int, button: Int, clickType: ClickType, player: Player) {
+        // clicks outside window pass index -999
+        // clicks on window, but not on slots pass index -1
+        // removing this will provoke OOB exceptions
+        if (index == -999 || index == -1) return super.clicked(index, button, clickType, player)
+
+        val slot = getSlot(index)
+        if (clickType == ClickType.PICKUP && slot.container is VariedSlotContainer && !carried.isEmpty) return
+
+        super.clicked(index, button, clickType, player)
     }
 
     override fun stillValid(player: Player): Boolean =
