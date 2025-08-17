@@ -6,11 +6,11 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Player
 
 class VariedSlotContainer(
-    val size: Int,
+    val containerSize: Int,
     private val onUpdate: () -> Unit,
     private val onOpen: () -> Unit,
     private val onClose: () -> Unit,
-) : SimpleContainer(size) {
+) : SimpleContainer(containerSize) {
     val storage: InventoryStorage = InventoryStorage.of(this, null)
 
     fun setChange() {

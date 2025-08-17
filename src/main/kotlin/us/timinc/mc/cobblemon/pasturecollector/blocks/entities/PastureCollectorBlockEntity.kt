@@ -60,7 +60,7 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
     override fun getDisplayName(): Component = TITLE
 
     override var inventory = VariedSlotContainer(
-        size = CONTAINER_SIZE,
+        containerSize = CONTAINER_SIZE,
         onUpdate = { ->
             level?.let { onUpdate(it, blockState, blockState) }
         },

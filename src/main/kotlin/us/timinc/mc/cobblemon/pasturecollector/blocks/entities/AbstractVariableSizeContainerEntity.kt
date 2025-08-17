@@ -8,13 +8,13 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
 import net.minecraft.world.ContainerHelper
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.WorldlyContainer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
-import us.timinc.mc.cobblemon.pasturecollector.container.VariedSlotContainer
 
 abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
     type: BlockEntityType<T>,
@@ -22,13 +22,13 @@ abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
     state: BlockState
 ) : BlockEntity(type, pos, state),
     WorldlyContainer {
-    abstract val inventory: VariedSlotContainer
+    abstract val inventory: SimpleContainer
 
     override fun getUpdatePacket(): Packet<ClientGamePacketListener> = ClientboundBlockEntityDataPacket.create(this)
 
     override fun clearContent() = inventory.clearContent()
 
-    override fun getContainerSize(): Int = inventory.size
+    override fun getContainerSize(): Int = inventory.containerSize
 
     override fun isEmpty(): Boolean = inventory.isEmpty
 
@@ -43,7 +43,7 @@ abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
     override fun stillValid(player: Player): Boolean = inventory.stillValid(player)
 
     override fun getSlotsForFace(direction: Direction): IntArray {
-        val result = IntArray(inventory.size)
+        val result = IntArray(inventory.containerSize)
         for (i in result.indices) {
             result[i] = i
         }
