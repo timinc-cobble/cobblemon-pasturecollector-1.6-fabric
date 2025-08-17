@@ -85,7 +85,7 @@ class PastureCollectorMenu(
     }
 
     private fun addBlockInventory(inventory: VariedSlotContainer) {
-        for (column in 0..inventory.size - 1) {
+        for (column in 0..<inventory.size) {
             addSlot(Slot(inventory, column, 53 + (column * 18), 18))
         }
     }
