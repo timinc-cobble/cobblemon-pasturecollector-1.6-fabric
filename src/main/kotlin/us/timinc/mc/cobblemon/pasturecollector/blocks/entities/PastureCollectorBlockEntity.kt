@@ -3,18 +3,20 @@ package us.timinc.mc.cobblemon.pasturecollector.blocks.entities
 import com.cobblemon.mod.common.CobblemonBlocks
 import com.cobblemon.mod.common.api.drop.ItemDropEntry
 import com.cobblemon.mod.common.block.entity.PokemonPastureBlockEntity
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.core.HolderLookup
-import net.minecraft.core.NonNullList
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.Container
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.ContainerHelper
-import net.minecraft.world.InteractionResult
-import net.minecraft.world.WorldlyContainer
-import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -27,94 +29,73 @@ import net.minecraft.world.phys.Vec3
 import us.timinc.mc.cobblemon.droploottables.api.droppers.FormDropContext
 import us.timinc.mc.cobblemon.droploottables.lootconditions.LootConditions
 import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod
+import us.timinc.mc.cobblemon.pasturecollector.container.VariedSlotContainer
 import us.timinc.mc.cobblemon.pasturecollector.droppers.PastureBlockDropper
-import kotlin.math.min
+import us.timinc.mc.cobblemon.pasturecollector.inventory.PastureCollectorMenu
+import us.timinc.mc.cobblemon.pasturecollector.network.BlockPosPayload
 
 class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
-    BlockEntity(PastureCollectorBlockEntities.PASTURECOLLECTOR_BLOCKENTITYTYPE, pos, state),
-    WorldlyContainer {
-
+    ExtendedScreenHandlerFactory<BlockPosPayload>,
+    BlockEntity(PastureCollectorBlockEntities.PASTURECOLLECTOR_BLOCKENTITYTYPE, pos, state) {
     companion object {
+        const val CONTAINER_SIZE: Int = 4
+
+        val TITLE: Component = Component.translatable(
+            ResourceLocation.fromNamespaceAndPath("block", "pasturecollector.pasture_collector").toLanguageKey()
+        )
+
         enum class DropResult {
             FULL,
             PARTIAL,
             NONE,
-            NO_DROP
+            NO_DROP,
+            CONTAINER_FULL
         }
     }
 
-    val inventory = NonNullList.withSize(1, ItemStack.EMPTY)
+    val inventory = VariedSlotContainer(
+        size = CONTAINER_SIZE,
+        onUpdate = { ->
+            level?.let { onUpdate(it, blockState, blockState) }
+        },
+        onOpen = { -> },
+        onClose = { -> }
+    )
 
-    fun retrieveItemManually(level: ServerLevel): InteractionResult {
-        val stack = getItem(0)
-        if (stack.isEmpty) return InteractionResult.FAIL
-        val tossPos = pos.center.add(Vec3(0.0, 0.65, 0.0))
-        level.addFreshEntity(ItemEntity(level, tossPos.x, tossPos.y, tossPos.z, stack))
-        clearContent()
-        return InteractionResult.SUCCESS
+    override fun getUpdatePacket(): Packet<ClientGamePacketListener> = ClientboundBlockEntityDataPacket.create(this)
+
+    override fun getScreenOpeningData(player: ServerPlayer): BlockPosPayload = BlockPosPayload(pos)
+
+    override fun getDisplayName(): Component = TITLE
+
+    override fun createMenu(syncId: Int, inventory: Inventory, player: Player) = PastureCollectorMenu(
+        syncId, inventory, this
+    )
+
+    override fun loadAdditional(nbt: CompoundTag, provider: HolderLookup.Provider) {
+        super.loadAdditional(nbt, provider)
+        ContainerHelper.loadAllItems(nbt, inventory.items, provider)
     }
 
-    fun onItemChanged(level: Level, oldState: BlockState, newState: BlockState) {
+    override fun saveAdditional(nbt: CompoundTag, provider: HolderLookup.Provider) {
+        ContainerHelper.saveAllItems(nbt, inventory.items, provider)
+        super.saveAdditional(nbt, provider)
+    }
+
+    override fun getUpdateTag(provider: HolderLookup.Provider): CompoundTag {
+        val nbt = super.getUpdateTag(provider)
+        saveAdditional(nbt, provider)
+        return nbt
+    }
+
+    fun onUpdate(level: Level, oldState: BlockState, newState: BlockState) {
         level.sendBlockUpdated(blockPos, oldState, newState, Block.UPDATE_CLIENTS)
         setChanged()
     }
 
-    override fun clearContent() {
-        inventory.clear()
-    }
-
-    override fun getContainerSize(): Int = inventory.size
-
-    override fun isEmpty(): Boolean = getItem(0).isEmpty
-
-    override fun getItem(i: Int): ItemStack = inventory[i]
-
-    override fun removeItem(i: Int, j: Int): ItemStack = ContainerHelper.removeItem(inventory, i, j)
-
-    override fun removeItemNoUpdate(i: Int): ItemStack {
-        if (inventory[i].isEmpty) return ItemStack.EMPTY
-        val stack = getItem(i)
-        inventory[i] = ItemStack.EMPTY
-        return stack
-    }
-
-    override fun setItem(i: Int, itemStack: ItemStack) {
-        val level = level ?: return
-        val oldState = level.getBlockState(pos)
-        inventory[i] = itemStack
-        val newState = level.getBlockState(pos)
-        onItemChanged(level, oldState, newState)
-    }
-
-    override fun stillValid(player: Player): Boolean = Container.stillValidBlockEntity(this, player)
-
-    override fun getSlotsForFace(side: Direction): IntArray {
-        val result = IntArray(inventory.size)
-        for (i in result.indices) {
-            result[i] = i
-        }
-        return result
-    }
-
-    override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
-
-    override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
-
-    override fun saveAdditional(data: CompoundTag, provider: HolderLookup.Provider) {
-        super.saveAdditional(data, provider)
-        ContainerHelper.saveAllItems(data, inventory, true, provider)
-    }
-
-    override fun loadAdditional(data: CompoundTag, provider: HolderLookup.Provider) {
-        super.loadAdditional(data, provider)
-        clearContent()
-        ContainerHelper.loadAllItems(data, inventory, provider)
-    }
-
     fun attemptToGetDrop(level: ServerLevel, pos: BlockPos): DropResult {
         val chosenMon = getNearbyPastures(
-            level,
-            pos
+            level
         ).flatMap { pasture ->
             pasture
                 .tetheredPokemon
@@ -156,47 +137,25 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
             })
         }
 
-        drops.shuffle()
-
         if (drops.all { it.isEmpty }) return DropResult.NO_DROP
 
         var didAnyDrop = false
-        for (itemStack in inventory) {
-            val toAdd = drops.firstOrNull { !it.isEmpty }
-            if (toAdd === null) continue
-            addStackWhereFits(toAdd)
-            didAnyDrop = true
-        }
+        drops
+            .filter { !it.isEmpty }
+            .forEach {
+                if (!inventory.canAddItem(it)) return DropResult.CONTAINER_FULL
+                inventory.addItem(it)
+                didAnyDrop = true
+            }
 
         if (!didAnyDrop) return DropResult.NONE
         if (drops.any { !it.isEmpty }) return DropResult.PARTIAL
         return DropResult.FULL
     }
 
-    private fun addStackWhereFits(stackToAdd: ItemStack) {
-        for (i in 0 until inventory.size) {
-            val stackInSlot = inventory[i]
-            if (stackInSlot.isEmpty) {
-                // This is a good slot because empty, just dump it in here.
-                setItem(i, stackToAdd.copyAndClear())
-                return
-            }
-            if (!stackToAdd.isStackable) continue
-            if (stackInSlot.item == stackToAdd.item) {
-                // Might be a good candidate, same item type.
-                if (stackInSlot.count >= stackInSlot.maxStackSize) continue
-                // Has space, let's stack.
-                val transferCount = min(stackToAdd.count, stackInSlot.maxStackSize - stackInSlot.count)
-                stackToAdd.shrink(transferCount)
-                stackInSlot.grow(transferCount)
-                if (stackToAdd.isEmpty) return
-            }
-        }
-    }
-
-    fun getNearbyPastures(level: ServerLevel, pos: BlockPos): List<PokemonPastureBlockEntity> {
+    fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {
         val positionsToCheck = mutableListOf<BlockPos>(
-            blockPos.north(), blockPos.east(), blockPos.south(), blockPos.west()
+            pos.north(), pos.east(), pos.south(), pos.west()
         )
         val listOfNearbyPastures = mutableListOf<PokemonPastureBlockEntity>()
         for (positionToCheck in positionsToCheck) {

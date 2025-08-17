@@ -1,0 +1,92 @@
+package us.timinc.mc.cobblemon.pasturecollector.inventory
+
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ContainerLevelAccess
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
+import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
+import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
+import us.timinc.mc.cobblemon.pasturecollector.container.VariedSlotContainer
+import us.timinc.mc.cobblemon.pasturecollector.network.BlockPosPayload
+
+class PastureCollectorMenu(
+    syncId: Int,
+    playerInventory: Inventory,
+    val blockEntity: PastureCollectorBlockEntity
+) : AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR_INVENTORY, syncId) {
+    // Client constructor
+    constructor(syncId: Int, playerInventory: Inventory, payload: BlockPosPayload) : this(
+        syncId,
+        playerInventory,
+        playerInventory.player.level().getBlockEntity(payload.pos) as PastureCollectorBlockEntity
+    )
+
+    private val context = ContainerLevelAccess.create(blockEntity.level!!, blockEntity.pos)
+
+    init {
+        val inventory = blockEntity.inventory
+        checkContainerSize(inventory, blockEntity.inventory.size)
+        inventory.startOpen(playerInventory.player)
+
+        addPlayerInventory(playerInventory)
+        addPlayerHotbar(playerInventory)
+        addBlockInventory(blockEntity.inventory)
+    }
+
+    // Prevent dragging items into empty block inventory slots
+    override fun canDragTo(slot: Slot): Boolean = false
+
+    // Prevent dragging items into empty block inventory slots
+    override fun canTakeItemForPickAll(itemStack: ItemStack, slot: Slot): Boolean = slot.container is Inventory
+
+    override fun quickMoveStack(
+        player: Player,
+        index: Int
+    ): ItemStack {
+        var stack = ItemStack.EMPTY
+        val slot = getSlot(index)
+        // Prevent quick placing items to block inventory
+        if (slot.container is Inventory) return stack
+        if (slot != null && slot.hasItem()) {
+            val slotStack = slot.item
+            stack = slotStack.copy()
+            val inventorySize = blockEntity.inventory.size
+            if (index < inventorySize) {
+                if (!moveItemStackTo(slotStack, inventorySize, this.slots.size, true)) return ItemStack.EMPTY
+            } else if (!moveItemStackTo(slotStack, 0, inventorySize, false)) return ItemStack.EMPTY
+
+            if (slotStack.isEmpty) {
+                slot.set(ItemStack.EMPTY)
+            } else {
+                slot.setChanged()
+            }
+        }
+
+        return stack
+    }
+
+    override fun stillValid(player: Player): Boolean =
+        stillValid(context, player, PastureCollectorBlocks.PASTURE_COLLECTOR)
+
+    private fun addPlayerInventory(playerInv: Inventory) {
+        for (row in 0..2) {
+            for (column in 0..8) {
+                addSlot(Slot(playerInv, 9 + (column + (row * 9)), 8 + (column * 18), 48 + (row * 18)))
+            }
+        }
+    }
+
+    private fun addPlayerHotbar(playerInv: Inventory) {
+        for (column in 0..8) {
+            addSlot(Slot(playerInv, column, 8 + (column * 18), 106))
+        }
+    }
+
+    private fun addBlockInventory(inventory: VariedSlotContainer) {
+        for (column in 0..inventory.size - 1) {
+            addSlot(Slot(inventory, column, 53 + (column * 18), 18))
+        }
+    }
+}
