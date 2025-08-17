@@ -81,9 +81,10 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         if (nextFloat() >= config.chanceToDrop) return
         val particle = when (getBlockEntity(pos, level).attemptToGetDrop(level, pos)) {
             PastureCollectorBlockEntity.Companion.DropResult.NO_DROP -> null
-            PastureCollectorBlockEntity.Companion.DropResult.NONE -> ParticleTypes.CAMPFIRE_COSY_SMOKE
+            PastureCollectorBlockEntity.Companion.DropResult.NONE -> ParticleTypes.ASH
             PastureCollectorBlockEntity.Companion.DropResult.PARTIAL -> ParticleTypes.CAMPFIRE_COSY_SMOKE
             PastureCollectorBlockEntity.Companion.DropResult.FULL -> ParticleTypes.COMPOSTER
+            PastureCollectorBlockEntity.Companion.DropResult.CONTAINER_FULL -> ParticleTypes.SMALL_FLAME
         }
         particle?.let {
             level.sendParticlesServer(
@@ -103,8 +104,12 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         player: Player,
         blockHitResult: BlockHitResult,
     ): InteractionResult {
-        if (level !is ServerLevel) return InteractionResult.SUCCESS_NO_ITEM_USED
-        return getBlockEntity(blockPos, level).retrieveItemManually(level)
+        if (!level.isClientSide) {
+            if (level.getBlockEntity(blockPos) is PastureCollectorBlockEntity) {
+                player.openMenu(level.getBlockEntity(blockPos) as PastureCollectorBlockEntity)
+            }
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide)
     }
 
     override fun getRenderShape(blockState: BlockState): RenderShape = RenderShape.MODEL
