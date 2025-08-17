@@ -5,6 +5,7 @@ import com.cobblemon.mod.common.api.drop.ItemDropEntry
 import com.cobblemon.mod.common.block.entity.PokemonPastureBlockEntity
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
@@ -49,6 +50,10 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
             CONTAINER_FULL
         }
     }
+
+    override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
+
+    override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
 
     override fun getScreenOpeningData(player: ServerPlayer): BlockPosPayload = BlockPosPayload(pos)
 

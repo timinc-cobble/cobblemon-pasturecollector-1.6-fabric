@@ -26,15 +26,11 @@ abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
 
     override fun getUpdatePacket(): Packet<ClientGamePacketListener> = ClientboundBlockEntityDataPacket.create(this)
 
-    override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
-
-    override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
-
     override fun clearContent() = inventory.clearContent()
 
     override fun getContainerSize(): Int = inventory.size
 
-    override fun isEmpty(): Boolean = getItem(0).isEmpty
+    override fun isEmpty(): Boolean = inventory.isEmpty
 
     override fun getItem(i: Int): ItemStack = inventory.getItem(i)
 
