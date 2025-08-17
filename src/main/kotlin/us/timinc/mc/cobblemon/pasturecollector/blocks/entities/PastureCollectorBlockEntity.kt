@@ -60,7 +60,7 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
     override fun getDisplayName(): Component = TITLE
 
     override var inventory = VariedSlotContainer(
-        containerSize = CONTAINER_SIZE,
+        size = CONTAINER_SIZE,
         onUpdate = { ->
             level?.let { onUpdate(it, blockState, blockState) }
         },
@@ -123,18 +123,22 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
 
         if (drops.all { it.isEmpty }) return DropResult.NO_DROP
 
-        var didAnyDrop = false
+        val dropCount = drops.count { !it.isEmpty }
+        var skipCount = 0
         drops
             .filter { !it.isEmpty }
             .forEach {
-                if (!inventory.canAddItem(it)) return DropResult.CONTAINER_FULL
+                if (!inventory.canAddItem(it)) {
+                    skipCount++
+                    return@forEach
+                }
                 inventory.addItem(it)
-                didAnyDrop = true
             }
 
-        if (!didAnyDrop) return DropResult.NONE
-        if (drops.any { !it.isEmpty }) return DropResult.PARTIAL
-        return DropResult.FULL
+        if (skipCount == dropCount) return DropResult.CONTAINER_FULL
+        if (skipCount > 0 && skipCount < dropCount) return DropResult.PARTIAL
+        if (skipCount == 0 && drops.count() == dropCount) return DropResult.FULL
+        return DropResult.NO_DROP
     }
 
     fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {

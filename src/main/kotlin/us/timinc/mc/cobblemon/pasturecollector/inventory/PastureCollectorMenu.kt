@@ -28,7 +28,7 @@ class PastureCollectorMenu(
 
     init {
         val inventory = blockEntity.inventory
-        checkContainerSize(inventory, blockEntity.inventory.containerSize)
+        checkContainerSize(inventory, blockEntity.inventory.size)
         inventory.startOpen(playerInventory.player)
 
         addPlayerInventory(playerInventory)
@@ -53,7 +53,7 @@ class PastureCollectorMenu(
         if (slot != null && slot.hasItem()) {
             val slotStack = slot.item
             stack = slotStack.copy()
-            val inventorySize = blockEntity.inventory.containerSize
+            val inventorySize = blockEntity.inventory.size
             if (index < inventorySize) {
                 if (!moveItemStackTo(slotStack, inventorySize, this.slots.size, true)) return ItemStack.EMPTY
             } else if (!moveItemStackTo(slotStack, 0, inventorySize, false)) return ItemStack.EMPTY
@@ -98,7 +98,7 @@ class PastureCollectorMenu(
     }
 
     private fun addBlockInventory(inventory: VariedSlotContainer) {
-        for (column in 0..<inventory.containerSize) {
+        for (column in 0..<inventory.size) {
             addSlot(Slot(inventory, column, 53 + (column * 18), 18))
         }
     }
