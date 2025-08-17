@@ -39,8 +39,7 @@ class PastureCollectorMenu(
     // Prevent dragging items into empty block inventory slots
     override fun canDragTo(slot: Slot): Boolean = slot.container is Inventory
 
-    // Prevent dragging items into empty block inventory slots
-    override fun canTakeItemForPickAll(itemStack: ItemStack, slot: Slot): Boolean = slot.container is Inventory
+    override fun canTakeItemForPickAll(itemStack: ItemStack, slot: Slot): Boolean = true
 
     override fun quickMoveStack(
         player: Player,
