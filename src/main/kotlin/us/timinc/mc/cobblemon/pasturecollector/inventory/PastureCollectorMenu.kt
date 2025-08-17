@@ -43,28 +43,27 @@ class PastureCollectorMenu(
 
     override fun quickMoveStack(
         player: Player,
-        index: Int
+        slotIndex: Int
     ): ItemStack {
-        var stack = ItemStack.EMPTY
-        val slot = getSlot(index)
-        // Prevent quick placing items to block inventory
-        if (slot.container is Inventory) return stack
+        var newStack = ItemStack.EMPTY
+        val slot = getSlot(slotIndex)
         if (slot != null && slot.hasItem()) {
-            val slotStack = slot.item
-            stack = slotStack.copy()
-            val inventorySize = blockEntity.inventory.size
-            if (index < inventorySize) {
-                if (!moveItemStackTo(slotStack, inventorySize, this.slots.size, true)) return ItemStack.EMPTY
-            } else if (!moveItemStackTo(slotStack, 0, inventorySize, false)) return ItemStack.EMPTY
+            val inSlot: ItemStack = slot.item
+            newStack = inSlot.copy()
 
-            if (slotStack.isEmpty) {
-                slot.set(ItemStack.EMPTY)
-            } else {
-                slot.setChanged()
+            if (slot.container is Inventory) {
+                return ItemStack.EMPTY
             }
+
+            if (slotIndex < 36) {
+                if (!moveItemStackTo(inSlot, 36, this.slots.size, true)) return ItemStack.EMPTY
+            } else if (!moveItemStackTo(inSlot, 0, 36, false)) return ItemStack.EMPTY
+
+            if (inSlot.isEmpty) slot.set(ItemStack.EMPTY)
+            else slot.setChanged()
         }
 
-        return stack
+        return newStack
     }
 
     override fun clicked(index: Int, button: Int, clickType: ClickType, player: Player) {
