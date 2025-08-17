@@ -48,12 +48,12 @@ class PastureCollectorMenu(
         var newStack = ItemStack.EMPTY
         val slot = getSlot(slotIndex)
         if (slot != null && slot.hasItem()) {
-            val inSlot: ItemStack = slot.item
-            newStack = inSlot.copy()
-
             if (slot.container is Inventory) {
                 return ItemStack.EMPTY
             }
+
+            val inSlot: ItemStack = slot.item
+            newStack = inSlot.copy()
 
             if (slotIndex < 36) {
                 if (!moveItemStackTo(inSlot, 36, this.slots.size, true)) return ItemStack.EMPTY
