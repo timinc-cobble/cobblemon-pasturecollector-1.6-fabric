@@ -121,12 +121,12 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
             })
         }
 
-        if (drops.all { it.isEmpty }) return DropResult.NO_DROP
+        val nonEmpty = drops.filter { !it.isEmpty }
+        if (nonEmpty.isEmpty()) return DropResult.NO_DROP
 
-        val dropCount = drops.count { !it.isEmpty }
+        val dropCount = nonEmpty.size
         var skipCount = 0
-        drops
-            .filter { !it.isEmpty }
+        nonEmpty
             .forEach {
                 if (!inventory.canAddItem(it)) {
                     skipCount++
@@ -135,10 +135,11 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
                 inventory.addItem(it)
             }
 
-        if (skipCount == dropCount) return DropResult.CONTAINER_FULL
-        if (skipCount > 0 && skipCount < dropCount) return DropResult.PARTIAL
-        if (skipCount == 0 && drops.count() == dropCount) return DropResult.FULL
-        return DropResult.NO_DROP
+        return when (skipCount) {
+            0 -> DropResult.FULL
+            dropCount -> DropResult.CONTAINER_FULL
+            else -> DropResult.PARTIAL
+        }
     }
 
     fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {
