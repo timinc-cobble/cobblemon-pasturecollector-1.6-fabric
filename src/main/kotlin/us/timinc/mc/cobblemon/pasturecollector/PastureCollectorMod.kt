@@ -9,6 +9,7 @@ import us.timinc.mc.cobblemon.droploottables.config.ConfigBuilder
 import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
 import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntities
 import us.timinc.mc.cobblemon.pasturecollector.config.PastureCollectorConfig
+import us.timinc.mc.cobblemon.pasturecollector.inventory.PastureCollectorMenus
 
 object PastureCollectorMod : ModInitializer {
     const val MOD_ID = "pasturecollector"
@@ -19,6 +20,7 @@ object PastureCollectorMod : ModInitializer {
         config = ConfigBuilder.load(PastureCollectorConfig::class.java, "pasture_collector")
         PastureCollectorBlockEntities.register()
         PastureCollectorBlocks.register()
+        PastureCollectorMenus.register()
 
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register { _, _, _ ->
             config = ConfigBuilder.load(PastureCollectorConfig::class.java, "pasture_collector")
