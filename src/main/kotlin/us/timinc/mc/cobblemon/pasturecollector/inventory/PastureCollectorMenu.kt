@@ -15,7 +15,7 @@ import us.timinc.mc.cobblemon.pasturecollector.network.BlockPosPayload
 class PastureCollectorMenu(
     syncId: Int,
     playerInventory: Inventory,
-    val blockEntity: PastureCollectorBlockEntity
+    val blockEntity: PastureCollectorBlockEntity,
 ) : AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR_INVENTORY, syncId) {
     // Client constructor
     constructor(syncId: Int, playerInventory: Inventory, payload: BlockPosPayload) : this(
@@ -43,7 +43,7 @@ class PastureCollectorMenu(
 
     override fun quickMoveStack(
         player: Player,
-        slotIndex: Int
+        slotIndex: Int,
     ): ItemStack {
         var newStack = ItemStack.EMPTY
         val slot = getSlot(slotIndex)

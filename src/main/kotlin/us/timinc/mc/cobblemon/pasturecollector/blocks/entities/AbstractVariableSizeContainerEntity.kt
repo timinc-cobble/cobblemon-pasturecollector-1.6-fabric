@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState
 abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
     type: BlockEntityType<T>,
     open val pos: BlockPos,
-    state: BlockState
+    state: BlockState,
 ) : BlockEntity(type, pos, state),
     WorldlyContainer {
     abstract val inventory: SimpleContainer
