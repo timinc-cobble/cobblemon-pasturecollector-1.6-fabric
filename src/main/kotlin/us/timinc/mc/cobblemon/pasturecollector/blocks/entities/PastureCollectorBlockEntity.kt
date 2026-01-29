@@ -3,7 +3,6 @@ package us.timinc.mc.cobblemon.pasturecollector.blocks.entities
 import com.cobblemon.mod.common.CobblemonBlocks
 import com.cobblemon.mod.common.api.drop.ItemDropEntry
 import com.cobblemon.mod.common.block.entity.PokemonPastureBlockEntity
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.Registries
@@ -11,6 +10,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.MenuProvider
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
@@ -26,15 +26,13 @@ import us.timinc.mc.cobblemon.pasturecollector.PastureCollectorMod
 import us.timinc.mc.cobblemon.pasturecollector.container.VariedSlotContainer
 import us.timinc.mc.cobblemon.pasturecollector.droppers.PastureBlockDropper
 import us.timinc.mc.cobblemon.pasturecollector.inventory.PastureCollectorMenu
-import us.timinc.mc.cobblemon.pasturecollector.network.BlockPosPayload
 
 class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState) :
-    ExtendedScreenHandlerFactory<BlockPosPayload>,
     AbstractVariableSizeContainerEntity<PastureCollectorBlockEntity>(
         PastureCollectorBlockEntities.PASTURECOLLECTOR_BLOCKENTITYTYPE,
         pos,
         state
-    ) {
+    ), MenuProvider {
     companion object {
         const val CONTAINER_SIZE: Int = 4
 
@@ -54,8 +52,6 @@ class PastureCollectorBlockEntity(override val pos: BlockPos, state: BlockState)
     override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
 
     override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
-
-    override fun getScreenOpeningData(player: ServerPlayer): BlockPosPayload = BlockPosPayload(pos)
 
     override fun getDisplayName(): Component = TITLE
 

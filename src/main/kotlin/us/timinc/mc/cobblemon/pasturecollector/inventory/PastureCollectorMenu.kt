@@ -1,39 +1,33 @@
 package us.timinc.mc.cobblemon.pasturecollector.inventory
 
+import net.minecraft.world.Container
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
-import net.minecraft.world.inventory.ContainerLevelAccess
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import us.timinc.mc.cobblemon.pasturecollector.blocks.PastureCollectorBlocks
-import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
-import us.timinc.mc.cobblemon.pasturecollector.container.VariedSlotContainer
-import us.timinc.mc.cobblemon.pasturecollector.network.BlockPosPayload
 
 class PastureCollectorMenu(
     syncId: Int,
     playerInventory: Inventory,
-    val blockEntity: PastureCollectorBlockEntity,
+    val container: Container,
 ) : AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR_INVENTORY, syncId) {
     // Client constructor
-    constructor(syncId: Int, playerInventory: Inventory, payload: BlockPosPayload) : this(
+    constructor(syncId: Int, playerInventory: Inventory) : this(
         syncId,
         playerInventory,
-        playerInventory.player.level().getBlockEntity(payload.pos) as PastureCollectorBlockEntity
+        SimpleContainer(4)
     )
 
-    private val context = ContainerLevelAccess.create(blockEntity.level!!, blockEntity.pos)
-
     init {
-        val inventory = blockEntity.inventory
-        checkContainerSize(inventory, blockEntity.inventory.size)
-        inventory.startOpen(playerInventory.player)
+        checkContainerSize(container, 4)
+        container.startOpen(playerInventory.player)
 
         addPlayerInventory(playerInventory)
         addPlayerHotbar(playerInventory)
-        addBlockInventory(blockEntity.inventory)
+        addBlockInventory(container)
     }
 
     // Prevent dragging items into empty block inventory slots
@@ -73,13 +67,12 @@ class PastureCollectorMenu(
         if (index == -999 || index == -1) return super.clicked(index, button, clickType, player)
 
         val slot = getSlot(index)
-        if (clickType == ClickType.PICKUP && slot.container is VariedSlotContainer && !carried.isEmpty) return
+        if (clickType == ClickType.PICKUP && slot.container == container && !carried.isEmpty) return
 
         super.clicked(index, button, clickType, player)
     }
 
-    override fun stillValid(player: Player): Boolean =
-        stillValid(context, player, PastureCollectorBlocks.PASTURE_COLLECTOR)
+    override fun stillValid(player: Player): Boolean = container.stillValid(player)
 
     private fun addPlayerInventory(playerInv: Inventory) {
         for (row in 0..2) {
@@ -95,8 +88,8 @@ class PastureCollectorMenu(
         }
     }
 
-    private fun addBlockInventory(inventory: VariedSlotContainer) {
-        for (column in 0..<inventory.size) {
+    private fun addBlockInventory(inventory: Container) {
+        for (column in 0..<inventory.containerSize) {
             addSlot(Slot(inventory, column, 53 + (column * 18), 18))
         }
     }

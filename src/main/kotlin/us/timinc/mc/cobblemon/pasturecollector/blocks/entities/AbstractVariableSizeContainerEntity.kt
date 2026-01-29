@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientGamePacketListener
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket
+import net.minecraft.world.Container
 import net.minecraft.world.ContainerHelper
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.WorldlyContainer
@@ -40,7 +41,7 @@ abstract class AbstractVariableSizeContainerEntity<T : BlockEntity>(
 
     override fun setItem(i: Int, itemStack: ItemStack) = inventory.setItem(i, itemStack)
 
-    override fun stillValid(player: Player): Boolean = inventory.stillValid(player)
+    override fun stillValid(player: Player): Boolean = Container.stillValidBlockEntity(this, player)
 
     override fun getSlotsForFace(direction: Direction): IntArray {
         val result = IntArray(inventory.containerSize)
