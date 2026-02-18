@@ -1,50 +1,73 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     id("dev.architectury.loom")
     id("architectury-plugin")
-    id("com.gradleup.shadow") version("9.2.2")
+    id("com.gradleup.shadow") version ("9.2.2")
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-    maven("https://maven.impactdev.net/repository/development/")
-    maven("https://api.modrinth.com/maven")
+architectury {
+    platformSetupLoomIde()
+    fabric()
 }
+
+loom {
+    silentMojangMappingsLicense()
+}
+
+val shadowCommon: Configuration by configurations.creating
 
 dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${property("fabric_loader_version")}")
 
-    // Fabric
+    modImplementation("net.fabricmc:fabric-loader:${property("fabric_loader_version")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}")
+
+    //needed for cobblemon
     modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
+    modImplementation("com.cobblemon:fabric:${property("cobblemon_version")}") { isTransitive = false }
+
+    implementation(project(":common", configuration = "namedElements"))
+    "developmentFabric"(project(":common", configuration = "namedElements"))
+    shadowCommon(project(":common", configuration = "transformProductionFabric"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${property("junit_version")}")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${property("junit_version")}")
 
     // Mod deps
-    modImplementation("com.cobblemon:fabric:${property("cobblemon_version")}")
     modImplementation("maven.modrinth:cobblemon-tim-core:${property("tim_core_fabric_version")}")
     modImplementation("maven.modrinth:cobblemon-droploottables:${property("droploottables_fabric_version")}")
 }
 
+
+
 tasks {
+    getByName<Test>("test") {
+        useJUnitPlatform()
+    }
+
     processResources {
         inputs.property("version", project.version)
 
         filesMatching("fabric.mod.json") {
-            expand(mutableMapOf("version" to project.version))
+            expand(project.properties)
         }
     }
 
     jar {
-        from("LICENSE")
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
+        archiveClassifier.set("dev-slim")
     }
 
-    compileKotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_21
-        }
+    shadowJar {
+        archiveClassifier.set("dev-shadow")
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
+        configurations = listOf(shadowCommon)
+    }
+
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.flatMap { it.archiveFile })
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
+        archiveVersion.set("${rootProject.version}")
     }
 }

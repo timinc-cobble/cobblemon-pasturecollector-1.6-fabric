@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "cobblemon_pasturecollector",
-  "version": "1.6-fabric-1.3.0",
+  "version": "1.7-fabric-1.4.0",
   "name": "Cobblemon Pasture Collector",
   "description": "Collects items from Pokemon in nearby Pasture Blocks in Cobblemon.",
   "authors": [
@@ -13,23 +13,22 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorMod"
+        "value": "us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorFabric"
       }
     ],
     "client": [
       {
         "adapter": "kotlin",
-        "value": "us.timinc.mc.cobblemon.pasturecollector.PastureCollectorModClient"
+        "value": "us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorModClient"
       }
     ]
   },
   "depends": {
     "java": ">=21",
-    "minecraft": "1.21.1",
-    "fabricloader": ">=0.16.9",
-    "fabric-language-kotlin": ">=1.9.3+kotlin.1.8.20",
+    "minecraft": "${minecraft_version}",
     "fabric": "*",
-    "cobblemon": ">=1.6.1",
-    "cobblemon_droploottables": ">=1.6-fabric-1.1.0"
+    "cobblemon": "${cobblemon_version}",
+    "tim_core": ">=${tim_core_fabric_version}",
+    "droploottables": ">=${droploottables_fabric_version}"
   }
 }
