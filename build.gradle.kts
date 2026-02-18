@@ -1,52 +1,33 @@
 plugins {
     id("java")
-    id("fabric-loom") version("1.9-SNAPSHOT")
-    kotlin("jvm") version ("2.1.0")
+    id("java-library")
+    kotlin("jvm") version("2.3.10")
+
+    id("dev.architectury.loom") version("1.11-SNAPSHOT") apply false
+    id("architectury-plugin") version("3.4-SNAPSHOT") apply false
 }
 
-group = property("maven_group")!!
-version = property("mod_version")!!
+allprojects {
+    apply(plugin = "java")
+    apply(plugin = "org.jetbrains.kotlin.jvm")
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-    maven("https://maven.impactdev.net/repository/development/")
-    maven("https://api.modrinth.com/maven")
-}
+    version = "${project.property("modCobblemonVersion")!!}-${project.property("modMyVersion")!!}"
+    group = project.property("maven_group")!!
 
-dependencies {
-    minecraft("com.mojang:minecraft:${property("minecraft_version")}")
-    mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
-
-    // Fabric API
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_version")}")
-
-    // Fabric Kotlin
-    modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
-
-    // Cobblemon
-    modImplementation("com.cobblemon:fabric:${property("cobblemon_version")}")
-
-    // Drop Loot Tables
-    modImplementation("maven.modrinth:cobblemon-droploottables:${property("droploottables_version")}")
-}
-
-tasks {
-    processResources {
-        inputs.property("version", project.version)
-
-        filesMatching("fabric.mod.json") {
-            expand(mutableMapOf("version" to project.version))
-        }
+    repositories {
+        mavenCentral()
+        maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
+        maven("https://maven.impactdev.net/repository/development/")
+        maven("https://maven.neoforged.net/releases")
+        maven("https://thedarkcolour.github.io/KotlinForForge/")
+        maven("https://api.modrinth.com/maven")
     }
 
-    jar {
-        from("LICENSE")
+    tasks.getByName<Test>("test") {
+        useJUnitPlatform()
     }
 
-    compileKotlin {
-        kotlinOptions.jvmTarget = "21"
+    java {
+        withSourcesJar()
     }
 }
