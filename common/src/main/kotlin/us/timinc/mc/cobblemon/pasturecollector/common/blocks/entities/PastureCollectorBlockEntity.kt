@@ -1,17 +1,16 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities
 
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
-import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities.PASTURECOLLECTOR_BLOCKENTITYTYPE
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities.PASTURE_COLLECTOR_BLOCK_ENTITY
 
 class PastureCollectorBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(PASTURECOLLECTOR_BLOCKENTITYTYPE, pos, state) {
+    BlockEntity(PASTURE_COLLECTOR_BLOCK_ENTITY, pos, state) {
     companion object {
         const val CONTAINER_SIZE: Int = 4
 

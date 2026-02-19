@@ -1,19 +1,13 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.inventory
 
-//import net.minecraft.world.entity.player.Inventory
-//import net.minecraft.world.entity.player.Player
-//import net.minecraft.world.inventory.AbstractContainerMenu
-//import net.minecraft.world.inventory.ClickType
-//import net.minecraft.world.inventory.ContainerLevelAccess
-//import net.minecraft.world.inventory.Slot
-//import net.minecraft.world.item.ItemStack
-//import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlocks
-//import us.timinc.mc.cobblemon.pasturecollector.common.container.VariedSlotContainer
-//import us.timinc.mc.cobblemon.pasturecollector.fabric.blocks.PastureCollectorBlocks
-//import us.timinc.mc.cobblemon.pasturecollector.fabric.blocks.entities.PastureCollectorBlockEntity
-//import us.timinc.mc.cobblemon.pasturecollector.fabric.container.VariedSlotContainer
-//import us.timinc.mc.cobblemon.pasturecollector.fabric.network.BlockPosPayload
-//
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerLevelAccess
+import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.ItemStack
+
 //class PastureCollectorMenu(
 //    syncId: Int,
 //    playerInventory: Inventory,

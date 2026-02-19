@@ -1,15 +1,19 @@
-package us.timinc.mc.cobblemon.pasturecollector.common.client.screen
+package us.timinc.mc.cobblemon.pasturecollector.common.client.menu
 
 //import net.minecraft.client.gui.GuiGraphics
 //import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 //import net.minecraft.network.chat.Component
 //import net.minecraft.world.entity.player.Inventory
-//import us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorMod.modIdentifier
-//import us.timinc.mc.cobblemon.pasturecollector.inventory.PastureCollectorMenu
+//import us.timinc.mc.cobblemon.droploottables.DropLootTables.modResource
+//import us.timinc.mc.cobblemon.pasturecollector.common.inventory.PastureCollectorMenu
 //
-//class PastureCollectorBlockScreen(menu: us.timinc.mc.cobblemon.pasturecollector.fabric.inventory.PastureCollectorMenu, inventory: Inventory, title: Component) :
+//class PastureCollectorBlockScreen(
+//    menu: PastureCollectorMenu,
+//    inventory: Inventory,
+//    title: Component
+//) :
 //    AbstractContainerScreen<PastureCollectorMenu>(menu, inventory, title) {
-//    val texture = modIdentifier("textures/gui/pasture_collector_inventory.png")
+//    val texture = modResource("textures/gui/pasture_collector_inventory.png")
 //
 //    init {
 //        this.imageWidth = 176

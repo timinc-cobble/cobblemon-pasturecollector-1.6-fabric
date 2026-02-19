@@ -4,18 +4,20 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.entity.BlockEntityType
 import us.timinc.mc.cobblemon.droploottables.DropLootTables.modResource
-import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlocks
+import us.timinc.mc.cobblemon.pasturecollector.PastureCollector
 
 object PastureCollectorBlockEntities {
-    lateinit var PASTURECOLLECTOR_BLOCKENTITYTYPE: BlockEntityType<PastureCollectorBlockEntity>
+    lateinit var PASTURE_COLLECTOR_BLOCK_ENTITY: BlockEntityType<PastureCollectorBlockEntity>
 
     fun register() {
-        PASTURECOLLECTOR_BLOCKENTITYTYPE =
+        PASTURE_COLLECTOR_BLOCK_ENTITY =
             Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
                 modResource("pasture_collector_entity"),
-                BlockEntityType.Builder.of(::PastureCollectorBlockEntity, PastureCollectorBlocks.PASTURE_COLLECTOR)
-                    .build(null)
+                BlockEntityType.Builder.of(
+                    ::PastureCollectorBlockEntity,
+                    PastureCollector.BlockRegistry.PASTURE_COLLECTOR.block
+                ).build(null)
             )
     }
 }
