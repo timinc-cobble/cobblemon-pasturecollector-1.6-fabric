@@ -11,6 +11,7 @@ architectury {
 
 loom {
     silentMojangMappingsLicense()
+    enableTransitiveAccessWideners.set(true)
 }
 
 val shadowCommon: Configuration by configurations.creating
@@ -59,15 +60,25 @@ tasks {
     }
 
     shadowJar {
-        archiveClassifier.set("dev-shadow")
-        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
         configurations = listOf(shadowCommon)
+
+        archiveBaseName.set("${rootProject.name}-${project.name}")
+        archiveVersion.set("${project.version}")
+        archiveClassifier.set("shadow")
     }
 
     remapJar {
+        injectAccessWidener = true
         dependsOn(shadowJar)
         inputFile.set(shadowJar.flatMap { it.archiveFile })
-        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
-        archiveVersion.set("${rootProject.version}")
+
+        archiveBaseName.set("${rootProject.name}-${project.name}")
+        archiveVersion.set("${project.version}")
+    }
+
+    remapSourcesJar {
+        archiveBaseName.set("${rootProject.name}-${project.name}")
+        archiveVersion.set("${project.version}")
+        archiveClassifier.set("sources")
     }
 }

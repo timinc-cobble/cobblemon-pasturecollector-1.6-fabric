@@ -1,12 +1,9 @@
-package us.timinc.mc.cobblemon.pasturecollector.fabric.blocks
+package us.timinc.mc.cobblemon.pasturecollector.common.blocks
 
-import com.cobblemon.mod.common.util.sendParticlesServer
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
-import net.minecraft.world.Containers
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.BlockGetter
@@ -16,20 +13,17 @@ import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
-import us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorMod.config
-import us.timinc.mc.cobblemon.pasturecollector.blocks.entities.PastureCollectorBlockEntity
-import us.timinc.mc.cobblemon.pasturecollector.extensions.Shapes16
-import kotlin.random.Random.Default.nextFloat
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
+import us.timinc.mc.cobblemon.pasturecollector.common.extensions.Shapes16
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
     companion object {
-        val CODEC = simpleCodec(::PastureCollectorBlock)
+        val CODEC: MapCodec<PastureCollectorBlock> = simpleCodec(::PastureCollectorBlock)
 
-        val SHAPE = Shapes.or(
+        val SHAPE: VoxelShape = Shapes.or(
             Shapes16.box(
                 0, 0, 0,
                 16, 12, 16
@@ -78,23 +72,23 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         random: RandomSource,
     ) {
         super.randomTick(state, level, pos, random)
-        if (nextFloat() >= config.chanceToDrop) return
-        val particle = when (getBlockEntity(pos, level).attemptToGetDrop(level, pos)) {
-            PastureCollectorBlockEntity.Companion.DropResult.NO_DROP -> null
-            PastureCollectorBlockEntity.Companion.DropResult.NONE -> ParticleTypes.ASH
-            PastureCollectorBlockEntity.Companion.DropResult.PARTIAL -> ParticleTypes.CAMPFIRE_COSY_SMOKE
-            PastureCollectorBlockEntity.Companion.DropResult.FULL -> ParticleTypes.COMPOSTER
-            PastureCollectorBlockEntity.Companion.DropResult.CONTAINER_FULL -> ParticleTypes.SMALL_FLAME
-        }
-        particle?.let {
-            level.sendParticlesServer(
-                it,
-                pos.center.add(Vec3(0.0, 0.65, 0.0)),
-                3,
-                Vec3(0.0, 0.1, 0.0),
-                0.0
-            )
-        }
+//        if (nextFloat() >= config.chanceToDrop) return
+//        val particle = when (getBlockEntity(pos, level).attemptToGetDrop(level, pos)) {
+//            PastureCollectorBlockEntity.Companion.DropResult.NO_DROP -> null
+//            PastureCollectorBlockEntity.Companion.DropResult.NONE -> ParticleTypes.ASH
+//            PastureCollectorBlockEntity.Companion.DropResult.PARTIAL -> ParticleTypes.CAMPFIRE_COSY_SMOKE
+//            PastureCollectorBlockEntity.Companion.DropResult.FULL -> ParticleTypes.COMPOSTER
+//            PastureCollectorBlockEntity.Companion.DropResult.CONTAINER_FULL -> ParticleTypes.SMALL_FLAME
+//        }
+//        particle?.let {
+//            level.sendParticlesServer(
+//                it,
+//                pos.center.add(Vec3(0.0, 0.65, 0.0)),
+//                3,
+//                Vec3(0.0, 0.1, 0.0),
+//                0.0
+//            )
+//        }
     }
 
     override fun useWithoutItem(
@@ -106,7 +100,7 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
     ): InteractionResult {
         if (!level.isClientSide) {
             if (level.getBlockEntity(blockPos) is PastureCollectorBlockEntity) {
-                player.openMenu(level.getBlockEntity(blockPos) as PastureCollectorBlockEntity)
+//                player.(level.getBlockEntity(blockPos) as PastureCollectorBlockEntity)
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide)
@@ -116,9 +110,13 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
 
     override fun isRandomlyTicking(blockState: BlockState): Boolean = true
 
+    @Throws(RuntimeException::class)
     fun getBlockEntity(pos: BlockPos, level: ServerLevel): PastureCollectorBlockEntity {
         val blockEntity = level.getBlockEntity(pos)
-        if (blockEntity !is PastureCollectorBlockEntity) throw Error("Tried to get an entity for a Pasture Block, but it wasn't a Pasture Block Entity.")
+        if (blockEntity !is PastureCollectorBlockEntity) {
+            @Suppress("TooGenericExceptionThrown")
+            throw RuntimeException("Tried to get an entity for a Pasture Block, but it wasn't a Pasture Block Entity.")
+        }
         return blockEntity
     }
 
@@ -129,7 +127,7 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         newState: BlockState,
         moved: Boolean,
     ) {
-        Containers.dropContentsOnDestroy(state, newState, world, pos)
+//        Containers.dropContentsOnDestroy(state, newState, world, pos)
         super.onRemove(state, world, pos, newState, moved)
     }
 }

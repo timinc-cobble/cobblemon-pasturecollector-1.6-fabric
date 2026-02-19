@@ -1,10 +1,10 @@
-package us.timinc.mc.cobblemon.pasturecollector.fabric.blocks.entities
+package us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities
 
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.entity.BlockEntityType
-import us.timinc.mc.cobblemon.pasturecollector.fabric.PastureCollectorMod.modIdentifier
-import us.timinc.mc.cobblemon.pasturecollector.fabric.blocks.PastureCollectorBlocks
+import us.timinc.mc.cobblemon.droploottables.DropLootTables.modResource
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlocks
 
 object PastureCollectorBlockEntities {
     lateinit var PASTURECOLLECTOR_BLOCKENTITYTYPE: BlockEntityType<PastureCollectorBlockEntity>
@@ -13,9 +13,9 @@ object PastureCollectorBlockEntities {
         PASTURECOLLECTOR_BLOCKENTITYTYPE =
             Registry.register(
                 BuiltInRegistries.BLOCK_ENTITY_TYPE,
-                modIdentifier("pasture_collector_entity"),
+                modResource("pasture_collector_entity"),
                 BlockEntityType.Builder.of(::PastureCollectorBlockEntity, PastureCollectorBlocks.PASTURE_COLLECTOR)
-                    .build()
+                    .build(null)
             )
     }
 }

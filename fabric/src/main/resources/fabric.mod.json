@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "id": "cobblemon_pasturecollector",
-  "version": "1.7-fabric-1.4.0",
-  "name": "Cobblemon Pasture Collector",
-  "description": "Collects items from Pokemon in nearby Pasture Blocks in Cobblemon.",
+  "id": "${modId}",
+  "version": "${modCobblemonVersion}-fabric-${modMyVersion}",
+  "name": "${modName}",
+  "description": "${modDescription}",
   "authors": [
-    "TimInc aka Timothy Metcalfe"
+    "${modAuthor}"
   ],
   "license": "MIT",
   "environment": "*",

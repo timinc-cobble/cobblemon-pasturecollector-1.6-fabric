@@ -1,6 +1,7 @@
-package us.timinc.mc.cobblemon.pasturecollector.fabric.extensions
+package us.timinc.mc.cobblemon.pasturecollector.common.extensions
 
 import net.minecraft.world.phys.shapes.Shapes
+import net.minecraft.world.phys.shapes.VoxelShape
 
 object Shapes16 {
     private const val DEFAULT_UNIT = 16
@@ -9,7 +10,7 @@ object Shapes16 {
     fun box(
         x1: Int, y1: Int, z1: Int,
         x2: Int, y2: Int, z2: Int,
-    ) = Shapes.box(
+    ): VoxelShape = Shapes.box(
         x1.toDouble() / DEFAULT_UNIT, y1.toDouble() / DEFAULT_UNIT, z1.toDouble() / DEFAULT_UNIT,
         x2.toDouble() / DEFAULT_UNIT, y2.toDouble() / DEFAULT_UNIT, z2.toDouble() / DEFAULT_UNIT,
     )
