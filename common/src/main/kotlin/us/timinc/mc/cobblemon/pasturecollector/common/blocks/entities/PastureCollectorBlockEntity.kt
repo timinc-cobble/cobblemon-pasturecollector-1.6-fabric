@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.WorldlyContainer
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
@@ -16,7 +17,11 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.storage.loot.LootParams
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams
+import us.timinc.mc.cobblemon.droploottables.DropLootTables
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities.PASTURE_COLLECTOR_BLOCK_ENTITY
+import us.timinc.mc.cobblemon.pasturecollector.common.dropper.PastureDropper
 
 class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     RandomizableContainerBlockEntity(PASTURE_COLLECTOR_BLOCK_ENTITY, pos, state), WorldlyContainer {
@@ -47,28 +52,33 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         level.sendBlockUpdated(pos, oldState, newState, Block.UPDATE_CLIENTS)
     }
 
-    fun attemptToGetDrop(level: ServerLevel, pos: BlockPos): DropResult = DropResult.NO_DROP
-//        val chosenMon = getNearbyPastures(
-//            level
-//        ).flatMap { pasture ->
-//            pasture
-//                .tetheredPokemon
-//                .mapNotNull { it.getPokemon() }
-//                .filter { it.entity != null }
-//        }.randomOrNull() ?: return DropResult.NO_DROP
-//
-//        val lootParams = LootParams(
-//            level,
-//            mapOf(
-//                LootContextParams.ORIGIN to pos.center,
-//                LootContextParams.THIS_ENTITY to chosenMon.entity!!,
-//                LootConditions.PARAMS.POKEMON_DETAILS to chosenMon,
-//                LootContextParams.BLOCK_ENTITY to this,
-//                LootContextParams.BLOCK_STATE to level.getBlockState(pos)
-//            ),
-//            mapOf<>(),
-//            0F
-//        )
+    fun attemptToGetDrop(level: ServerLevel, pos: BlockPos): DropResult {
+        val chosenMon = getNearbyPastures(level).flatMap { pasture ->
+            pasture
+                .tetheredPokemon
+                .mapNotNull { it.getPokemon() }
+                .filter { it.entity != null }
+        }.randomOrNull() ?: return DropResult.NO_DROP
+
+        val lootParams = LootParams(
+            level,
+            mapOf(
+                LootContextParams.ORIGIN to pos.center,
+                LootContextParams.THIS_ENTITY to chosenMon.entity!!,
+                DropLootTables.LootItemConditionTypes.POKEMON_MATCHER_CONDITION to chosenMon,
+                LootContextParams.BLOCK_ENTITY to this,
+                LootContextParams.BLOCK_STATE to level.getBlockState(pos)
+            ),
+            mapOf(),
+            0F
+        )
+
+        val drops = PastureDropper.get
+
+
+        return DropResult.NO_DROP
+    }
+
 //        val drops = PastureBlockDropper.getDrops(lootParams, FormDropContext(chosenMon.form)).toMutableList()
 //
 //        if (PastureCollectorMod.config.baseCobblemonLootEnabled && !PastureBlockDropper.lootTableExists(
@@ -144,5 +154,24 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
 
     override fun getSlotsForFace(direction: Direction?): IntArray? {
         TODO("Not yet implemented")
+    }
+
+    fun putOrDropItem(item: ItemStack) {
+        if (level !is ServerLevel) return
+        if (items.count() == CONTAINER_SIZE) dropItemToLevel(item)
+        items.add(item)
+    }
+
+    fun dropItemToLevel(item: ItemStack) {
+        if (level !is ServerLevel) return
+        (level as ServerLevel).addFreshEntity(
+            ItemEntity(
+                level,
+                pos.x.toDouble(),
+                pos.y.plus(1).toDouble(),
+                pos.z.toDouble(),
+                item
+            )
+        )
     }
 }
