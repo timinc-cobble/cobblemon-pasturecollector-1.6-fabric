@@ -1,16 +1,25 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities
 
+import com.cobblemon.mod.common.CobblemonBlocks
+import com.cobblemon.mod.common.block.entity.PokemonPastureBlockEntity
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
+import net.minecraft.core.NonNullList
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.SimpleContainer
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.WorldlyContainer
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities.PASTURE_COLLECTOR_BLOCK_ENTITY
 
-class PastureCollectorBlockEntity(pos: BlockPos, state: BlockState) :
-    BlockEntity(PASTURE_COLLECTOR_BLOCK_ENTITY, pos, state) {
+class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
+    RandomizableContainerBlockEntity(PASTURE_COLLECTOR_BLOCK_ENTITY, pos, state), WorldlyContainer {
     companion object {
         const val CONTAINER_SIZE: Int = 4
 
@@ -27,30 +36,18 @@ class PastureCollectorBlockEntity(pos: BlockPos, state: BlockState) :
         }
     }
 
-//    override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
+    private val items: NonNullList<ItemStack> = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY)
 
-//    override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
-
-//    override fun getScreenOpeningData(player: ServerPlayer): BlockPosPayload = BlockPosPayload(pos)
-
-//    override fun getDisplayName(): Component = TITLE
-
-//    override var inventory = VariedSlotContainer(
-//        size = CONTAINER_SIZE,
-//        onUpdate = { ->
-//            level?.let { onUpdate(it, blockState, blockState) }
-//        }
-//    )
-
-//    override fun createMenu(syncId: Int, inventory: Inventory, player: Player): PastureCollectorMenu = PastureCollectorMenu(
-//        syncId, inventory, this
-//    )
+    override fun getDefaultName(): Component = TITLE
+    override fun getContainerSize(): Int = CONTAINER_SIZE
+    override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
+    override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction) = true
 
     fun onUpdate(level: Level, oldState: BlockState, newState: BlockState) {
-//        level.sendBlockUpdated(pos, oldState, newState, Block.UPDATE_CLIENTS)
+        level.sendBlockUpdated(pos, oldState, newState, Block.UPDATE_CLIENTS)
     }
 
-//    fun attemptToGetDrop(level: ServerLevel, pos: BlockPos): DropResult {
+    fun attemptToGetDrop(level: ServerLevel, pos: BlockPos): DropResult = DropResult.NO_DROP
 //        val chosenMon = getNearbyPastures(
 //            level
 //        ).flatMap { pasture ->
@@ -115,18 +112,37 @@ class PastureCollectorBlockEntity(pos: BlockPos, state: BlockState) :
 //        }
 //    }
 
-//    fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {
-//        val positionsToCheck = mutableListOf<BlockPos>(
-//            pos.north(), pos.east(), pos.south(), pos.west()
-//        )
-//        val listOfNearbyPastures = mutableListOf<PokemonPastureBlockEntity>()
-//        for (positionToCheck in positionsToCheck) {
-//            val targetBlockState = level.getBlockState(positionToCheck)
-//            val targetBlockEntity = level.getBlockEntity(positionToCheck)
-//            if (targetBlockState.block == CobblemonBlocks.PASTURE && targetBlockEntity is PokemonPastureBlockEntity) {
-//                listOfNearbyPastures.add(targetBlockEntity)
-//            }
-//        }
-//        return listOfNearbyPastures
-//    }
+    fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {
+        val positionsToCheck = mutableListOf<BlockPos>(
+            pos.north(), pos.east(), pos.south(), pos.west()
+        )
+        val listOfNearbyPastures = mutableListOf<PokemonPastureBlockEntity>()
+        for (positionToCheck in positionsToCheck) {
+            val targetBlockState = level.getBlockState(positionToCheck)
+            val targetBlockEntity = level.getBlockEntity(positionToCheck)
+            if (targetBlockState.block == CobblemonBlocks.PASTURE && targetBlockEntity is PokemonPastureBlockEntity) {
+                listOfNearbyPastures.add(targetBlockEntity)
+            }
+        }
+        return listOfNearbyPastures
+    }
+
+
+    override fun getItems(): NonNullList<ItemStack> = items
+
+    override fun setItems(items: NonNullList<ItemStack>) {
+        this.items.clear()
+        this.items.addAll(items.take(CONTAINER_SIZE))
+    }
+
+    override fun createMenu(
+        i: Int,
+        inventory: Inventory?
+    ): AbstractContainerMenu? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getSlotsForFace(direction: Direction?): IntArray? {
+        TODO("Not yet implemented")
+    }
 }

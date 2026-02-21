@@ -4,7 +4,7 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.block.entity.BlockEntityType
 import us.timinc.mc.cobblemon.droploottables.DropLootTables.modResource
-import us.timinc.mc.cobblemon.pasturecollector.PastureCollector
+import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
 
 object PastureCollectorBlockEntities {
     lateinit var PASTURE_COLLECTOR_BLOCK_ENTITY: BlockEntityType<PastureCollectorBlockEntity>

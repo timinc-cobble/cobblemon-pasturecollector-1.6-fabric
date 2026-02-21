@@ -1,19 +1,15 @@
-package us.timinc.mc.cobblemon.pasturecollector
+package us.timinc.mc.cobblemon.pasturecollector.common
 
 import com.cobblemon.mod.common.item.group.CobblemonItemGroups
-import com.cobblemon.mod.common.platform.PlatformRegistry
-import net.minecraft.core.Registry
-import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlock
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities
 import us.timinc.mc.cobblemon.timcore.AbstractConfig
 import us.timinc.mc.cobblemon.timcore.AbstractMod
 import us.timinc.mc.cobblemon.timcore.BlockContainer
 
 const val MOD_ID = "pasturecollector"
-
-typealias ModRegistry<T> = PlatformRegistry<Registry<T>, ResourceKey<Registry<T>>, T>
 
 object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
     MOD_ID,
@@ -35,6 +31,8 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
     }
 
     init {
+        @Suppress("UnusedExpression")
         BlockRegistry
+        PastureCollectorBlockEntities.register()
     }
 }

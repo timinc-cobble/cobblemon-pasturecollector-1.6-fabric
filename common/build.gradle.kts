@@ -6,7 +6,7 @@ plugins {
 architectury {
     common(
         // @TODO: Uncomment me when ready
-        // "neoforge",
+        "neoforge",
         "fabric"
     )
 }

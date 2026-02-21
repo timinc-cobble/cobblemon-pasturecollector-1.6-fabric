@@ -2,7 +2,7 @@ package us.timinc.mc.cobblemon.pasturecollector.fabric
 
 import com.cobblemon.mod.common.item.group.CobblemonItemGroups
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
-import us.timinc.mc.cobblemon.pasturecollector.PastureCollector
+import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
 import us.timinc.mc.cobblemon.timcore.fabric.AbstractFabricMod
 
 object PastureCollectorFabric : AbstractFabricMod(PastureCollector) {
