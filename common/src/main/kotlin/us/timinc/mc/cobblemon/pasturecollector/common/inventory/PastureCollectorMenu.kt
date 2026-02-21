@@ -80,22 +80,22 @@ class PastureCollectorMenu(
     override fun stillValid(player: Player): Boolean =
         stillValid(context, player, PastureCollector.BlockRegistry.PASTURE_COLLECTOR.block)
 
-    private fun addPlayerInventory(playerInv: Inventory) {
+    private fun addPlayerInventory(playerInventory: Inventory) {
         for (row in 0..2) {
             for (column in 0..8) {
-                addSlot(Slot(playerInv, 9 + (column + (row * 9)), 8 + (column * 18), 48 + (row * 18)))
+                addSlot(Slot(playerInventory, 9 + (column + (row * 9)), 8 + (column * 18), 48 + (row * 18)))
             }
         }
     }
 
-    private fun addPlayerHotbar(playerInv: Inventory) {
+    private fun addPlayerHotbar(playerInventory: Inventory) {
         for (column in 0..8) {
-            addSlot(Slot(playerInv, column, 8 + (column * 18), 106))
+            addSlot(Slot(playerInventory, column, 8 + (column * 18), 106))
         }
     }
 
-    private fun addBlockInventory(inventory: VariedSlotContainer) {
-        for (column in 0..<inventory.size) {
+    private fun addBlockInventory(inventory: PastureCollectorBlockEntity) {
+        for (column in 0..<inventory.containerSize) {
             addSlot(Slot(inventory, column, 53 + (column * 18), 18))
         }
     }
