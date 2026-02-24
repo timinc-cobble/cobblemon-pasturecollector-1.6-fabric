@@ -1,6 +1,5 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.dropper
 
-import com.cobblemon.mod.common.pokemon.Pokemon
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
@@ -10,7 +9,6 @@ import net.minecraft.world.level.storage.loot.LootParams
 import net.minecraft.world.level.storage.loot.parameters.LootContextParam
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition
-import us.timinc.mc.cobblemon.droploottables.DropLootTables
 import us.timinc.mc.cobblemon.droploottables.api.DropContext
 import us.timinc.mc.cobblemon.droploottables.api.Dropper
 import us.timinc.mc.cobblemon.droploottables.api.Dropper.Companion.CodecPieces

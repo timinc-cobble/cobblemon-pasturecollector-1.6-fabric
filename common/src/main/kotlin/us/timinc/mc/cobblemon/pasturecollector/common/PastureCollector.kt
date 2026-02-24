@@ -7,6 +7,7 @@ import us.timinc.mc.cobblemon.droploottables.DropLootTables
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlock
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntities
 import us.timinc.mc.cobblemon.pasturecollector.common.dropper.PastureDropper
+import us.timinc.mc.cobblemon.pasturecollector.common.inventory.PastureCollectorMenus
 import us.timinc.mc.cobblemon.timcore.AbstractConfig
 import us.timinc.mc.cobblemon.timcore.AbstractMod
 import us.timinc.mc.cobblemon.timcore.BlockContainer
@@ -57,6 +58,7 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
     init {
         @Suppress("UnusedExpression")
         BlockRegistry
+        PastureCollectorMenus.register()
         PastureCollectorBlockEntities.register()
     }
 }

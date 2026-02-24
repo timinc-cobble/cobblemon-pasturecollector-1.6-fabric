@@ -1,85 +1,55 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.inventory
 
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.ClickType
-import net.minecraft.world.inventory.ContainerLevelAccess
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
-import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
-import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
-import us.timinc.mc.cobblemon.pasturecollector.common.container.VariedSlotContainer
-import us.timinc.mc.cobblemon.pasturecollector.common.network.BlockPosPayload
 
-class PastureCollectorMenu(
-    syncId: Int,
-    playerInventory: Inventory,
-    val blockEntity: PastureCollectorBlockEntity,
-) : AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR, syncId) {
-    // Client constructor
-    constructor(syncId: Int, playerInventory: Inventory, payload: BlockPosPayload) : this(
-        syncId,
-        playerInventory,
-        playerInventory.player.level().getBlockEntity(payload.pos) as PastureCollectorBlockEntity
-    )
+class PastureCollectorMenu(syncId: Int, playerInventory: Inventory) :
+    AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR, syncId) {
+    companion object {
+        const val CONTAINER_SIZE = 4
+    }
 
-    private val context = ContainerLevelAccess.create(blockEntity.level!!, blockEntity.pos)
+    val container: SimpleContainer = SimpleContainer(CONTAINER_SIZE)
 
     init {
-        val inventory = blockEntity
-        inventory.startOpen(playerInventory.player)
+        container.startOpen(playerInventory.player)
 
         addPlayerInventory(playerInventory)
         addPlayerHotbar(playerInventory)
-        addBlockInventory(blockEntity)
+        addBlockInventory()
     }
 
-    // Prevent dragging items into empty block inventory slots
-    override fun canDragTo(slot: Slot): Boolean = slot.container is Inventory
-
-    override fun canTakeItemForPickAll(itemStack: ItemStack, slot: Slot): Boolean = true
-
-    override fun quickMoveStack(
-        player: Player,
-        slotIndex: Int,
-    ): ItemStack {
-        var newStack = ItemStack.EMPTY
-        val slot = getSlot(slotIndex)
-        if (slot != null && slot.hasItem()) {
-            if (slot.container is Inventory) {
+    override fun quickMoveStack(player: Player, i: Int): ItemStack {
+        var itemStack = ItemStack.EMPTY
+        val slot = this.slots[i]
+        if (slot.hasItem()) {
+            val itemStack2 = slot.item
+            itemStack = itemStack2.copy()
+            if (i < CONTAINER_SIZE) {
+                if (!this.moveItemStackTo(itemStack2, CONTAINER_SIZE, this.slots.size, true)) {
+                    return ItemStack.EMPTY
+                }
+            } else if (!this.moveItemStackTo(itemStack2, 0, CONTAINER_SIZE, false)) {
                 return ItemStack.EMPTY
             }
 
-            val inSlot: ItemStack = slot.item
-            newStack = inSlot.copy()
-
-            if (slotIndex < 36) {
-                if (!moveItemStackTo(inSlot, 36, this.slots.size, true)) return ItemStack.EMPTY
-            } else if (!moveItemStackTo(inSlot, 0, 36, false)) return ItemStack.EMPTY
-
-            if (inSlot.isEmpty) slot.set(ItemStack.EMPTY)
-            else slot.setChanged()
+            if (itemStack2.isEmpty) {
+                slot.setByPlayer(ItemStack.EMPTY)
+            } else {
+                slot.setChanged()
+            }
         }
 
-        return newStack
+        return itemStack
     }
 
-    override fun clicked(index: Int, button: Int, clickType: ClickType, player: Player) {
-        // clicks outside window pass index -999
-        // clicks on window, but not on slots pass index -1
-        // removing this will provoke OOB exceptions
-        if (index == -999 || index == -1) return super.clicked(index, button, clickType, player)
+    override fun stillValid(player: Player): Boolean = container.stillValid(player)
 
-        val slot = getSlot(index)
-        if (clickType == ClickType.PICKUP && slot.container is VariedSlotContainer && !carried.isEmpty) return
-
-        super.clicked(index, button, clickType, player)
-    }
-
-    override fun stillValid(player: Player): Boolean =
-        stillValid(context, player, PastureCollector.BlockRegistry.PASTURE_COLLECTOR.block)
-
+    @Suppress("MagicNumber")
     private fun addPlayerInventory(playerInventory: Inventory) {
         for (row in 0..2) {
             for (column in 0..8) {
@@ -88,15 +58,17 @@ class PastureCollectorMenu(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun addPlayerHotbar(playerInventory: Inventory) {
         for (column in 0..8) {
             addSlot(Slot(playerInventory, column, 8 + (column * 18), 106))
         }
     }
 
-    private fun addBlockInventory(inventory: PastureCollectorBlockEntity) {
-        for (column in 0..<inventory.containerSize) {
-            addSlot(Slot(inventory, column, 53 + (column * 18), 18))
+    @Suppress("MagicNumber")
+    private fun addBlockInventory() {
+        for (column in 0..<CONTAINER_SIZE) {
+            addSlot(Slot(container, column, 53 + (column * 18), 18))
         }
     }
 }

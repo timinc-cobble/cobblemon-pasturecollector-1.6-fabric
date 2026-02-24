@@ -4,7 +4,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Inventory
-import us.timinc.mc.cobblemon.droploottables.DropLootTables.modResource
+import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.modResource
 import us.timinc.mc.cobblemon.pasturecollector.common.inventory.PastureCollectorMenu
 
 class PastureCollectorBlockScreen(menu: PastureCollectorMenu, inventory: Inventory, title: Component) :
