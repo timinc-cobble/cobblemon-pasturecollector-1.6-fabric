@@ -6,9 +6,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
+import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Registries.Menu.PASTURE_COLLECTOR_MENU
 
 class PastureCollectorMenu(syncId: Int, playerInventory: Inventory) :
-    AbstractContainerMenu(PastureCollectorMenus.PASTURE_COLLECTOR, syncId) {
+    AbstractContainerMenu(PASTURE_COLLECTOR_MENU, syncId) {
     companion object {
         const val CONTAINER_SIZE = 4
     }

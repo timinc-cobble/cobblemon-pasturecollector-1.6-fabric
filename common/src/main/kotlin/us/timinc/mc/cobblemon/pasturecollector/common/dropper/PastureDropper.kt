@@ -42,12 +42,7 @@ class PastureDropper(
         val DROPPER_TYPE = DropperType(CODEC)
     }
 
-    override fun getType(): DropperType<*, *> = PastureCollector.DropperTypes.PASTURE
-
-    class Context(
-        override val level: ServerLevel,
-        val collectorPos: BlockPos
-    ) : DropContext {
+    class Context(override val level: ServerLevel, val collectorPos: BlockPos) : DropContext {
         override fun toLootParams(): LootParams {
             val params = mutableMapOf<LootContextParam<out Any>, Any>(
                 LootContextParams.ORIGIN to collectorPos,
@@ -61,4 +56,6 @@ class PastureDropper(
             )
         }
     }
+
+    override fun getType(): DropperType<*, *> = PastureCollector.DropperTypes.PASTURE
 }
