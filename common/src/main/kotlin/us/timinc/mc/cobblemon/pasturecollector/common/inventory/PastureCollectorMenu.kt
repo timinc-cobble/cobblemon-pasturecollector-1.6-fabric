@@ -5,6 +5,7 @@ import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Registries.Menu.PASTURE_COLLECTOR_MENU
@@ -25,32 +26,6 @@ class PastureCollectorMenu(syncId: Int, playerInventory: Inventory, val containe
         addPlayerInventory(playerInventory)
         addPlayerHotbar(playerInventory)
         addBlockInventory()
-    }
-
-    override fun quickMoveStack(player: Player, slotIndex: Int): ItemStack {
-        var itemStack = ItemStack.EMPTY
-        val slot = this.slots[slotIndex]
-
-        if (!slot.hasItem()) return itemStack
-
-
-        val slotStack = slot.item
-        itemStack = slotStack.copy()
-        if (slotIndex < CONTAINER_SIZE) {
-            if (!this.moveItemStackTo(slotStack, CONTAINER_SIZE, this.slots.size, true)) {
-                return ItemStack.EMPTY
-            }
-        } else if (!this.moveItemStackTo(slotStack, 0, CONTAINER_SIZE, false)) {
-            return ItemStack.EMPTY
-        }
-
-        if (slotStack.isEmpty) {
-            slot.setByPlayer(ItemStack.EMPTY)
-        } else {
-            slot.setChanged()
-        }
-
-        return itemStack
     }
 
     override fun stillValid(player: Player): Boolean = container.stillValid(player)
@@ -76,5 +51,46 @@ class PastureCollectorMenu(syncId: Int, playerInventory: Inventory, val containe
         repeat(CONTAINER_SIZE) { slot ->
             addSlot(Slot(container, slot, 53 + (slot * 18), 18))
         }
+    }
+
+    override fun canDragTo(slot: Slot): Boolean = slot.container is Inventory
+
+    override fun clicked(index: Int, button: Int, clickType: ClickType, player: Player) {
+        if (index < 0) return super.clicked(index, button, clickType, player)
+        val slot = getSlot(index)
+        val allowed = listOf(
+            ClickType.PICKUP,
+            ClickType.PICKUP_ALL
+        )
+
+        if (clickType in allowed && slot.container is SimpleContainer && !carried.isEmpty) return
+
+        return super.clicked(index, button, clickType, player)
+    }
+
+    override fun quickMoveStack(player: Player, slotIndex: Int): ItemStack {
+        var itemStack = ItemStack.EMPTY
+        val slot = this.slots[slotIndex]
+
+        if (slot.container !is SimpleContainer) return itemStack
+        if (!slot.hasItem()) return itemStack
+
+        val slotStack = slot.item
+        itemStack = slotStack.copy()
+        if (slotIndex < CONTAINER_SIZE) {
+            if (!this.moveItemStackTo(slotStack, CONTAINER_SIZE, this.slots.size, true)) {
+                return ItemStack.EMPTY
+            }
+        } else if (!this.moveItemStackTo(slotStack, 0, CONTAINER_SIZE, false)) {
+            return ItemStack.EMPTY
+        }
+
+        if (slotStack.isEmpty) {
+            slot.setByPlayer(ItemStack.EMPTY)
+        } else {
+            slot.setChanged()
+        }
+
+        return itemStack
     }
 }

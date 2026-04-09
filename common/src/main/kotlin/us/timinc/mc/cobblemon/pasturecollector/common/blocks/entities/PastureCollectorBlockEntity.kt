@@ -8,6 +8,7 @@ import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
 import net.minecraft.core.NonNullList.of
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.particles.SimpleParticleType
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
@@ -51,8 +52,16 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     override fun getSlotsForFace(direction: Direction): IntArray = IntArray(CONTAINER_SIZE)
     override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
     override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction) = true
+
+    override fun getItems(): NonNullList<ItemStack> = container.items
+
+    override fun setItems(items: NonNullList<ItemStack>) {
+        container.removeAllItems()
+        container.items.addAll(items.take(CONTAINER_SIZE))
+    }
+
     override fun createMenu(containerId: Int, inventory: Inventory): AbstractContainerMenu =
-        PastureCollectorMenu(containerId, inventory, this)
+        PastureCollectorMenu(containerId, inventory, this.container)
 
     /**
      * Randomly chooses one species from nearby pasture blocks.
@@ -60,13 +69,14 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
      */
     fun attemptToGetDrop() {
         if (level !is ServerLevel) return
+
         val chosenMon = getNearbyPastures(level as ServerLevel).flatMap { pasture ->
             pasture
                 .tetheredPokemon
                 .mapNotNull { it.getPokemon() }
                 .filter { it.entity != null }
         }.randomOrNull() ?: return
-        PastureCollector.debugger.debug("random tick::chance to drop checked::inside attemptToGetDrop", true)
+
         PastureCollector.Events.PASTURE_COLLECTOR_TICKED.emit(PastureCollectorTickedEvent(chosenMon, this))
     }
 
@@ -102,14 +112,6 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         return listOfNearbyPastures
     }
 
-
-    override fun getItems(): NonNullList<ItemStack> = container.items
-
-    override fun setItems(items: NonNullList<ItemStack>) {
-        container.removeAllItems()
-        container.items.addAll(items.take(CONTAINER_SIZE))
-    }
-
     /**
      * Drop item to level
      *
@@ -130,7 +132,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     }
 
     fun handleDropPlacement(drop: ItemStack) {
-        var particle = ParticleTypes.CAMPFIRE_COSY_SMOKE
+        var particle: SimpleParticleType
 
         if (container.canAddItem(drop)) {
             val remains = container.addItem(drop)
