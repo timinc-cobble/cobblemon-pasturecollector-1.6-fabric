@@ -2,12 +2,16 @@ package us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities
 
 import com.cobblemon.mod.common.CobblemonBlocks
 import com.cobblemon.mod.common.block.entity.PokemonPastureBlockEntity
+import com.cobblemon.mod.common.util.sendParticlesServer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.NonNullList
+import net.minecraft.core.NonNullList.of
+import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.SimpleContainer
 import net.minecraft.world.WorldlyContainer
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Inventory
@@ -15,10 +19,19 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Registries.Entity.PASTURE_COLLECTOR_BLOCK_ENTITY
 import us.timinc.mc.cobblemon.pasturecollector.common.event.PastureCollectorTickedEvent
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler.PARTICLE_AMOUNT
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler.PARTICLE_OFFSET_Y
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler.PARTICLE_POS_XZ_RANDOMNESS_MAX
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler.PARTICLE_POS_XZ_RANDOMNESS_MIN
+import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler.PARTICLE_POS_Y
 import us.timinc.mc.cobblemon.pasturecollector.common.inventory.PastureCollectorMenu
+import kotlin.collections.count
+import kotlin.random.Random
 
 @Suppress("TooManyFunctions")
 class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
@@ -31,13 +44,20 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         )
     }
 
-    private val items: NonNullList<ItemStack> = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY)
+    private val container = SimpleContainer(CONTAINER_SIZE)
 
     override fun getDefaultName(): Component = TITLE
     override fun getContainerSize(): Int = CONTAINER_SIZE
+    override fun getSlotsForFace(direction: Direction): IntArray = IntArray(CONTAINER_SIZE)
     override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
     override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction) = true
+    override fun createMenu(containerId: Int, inventory: Inventory): AbstractContainerMenu =
+        PastureCollectorMenu(containerId, inventory, this)
 
+    /**
+     * Randomly chooses one species from nearby pasture blocks.
+     * Triggers [PastureCollectorTickedEvent] which decides if there are any drops it can get from species
+     */
     fun attemptToGetDrop() {
         if (level !is ServerLevel) return
         val chosenMon = getNearbyPastures(level as ServerLevel).flatMap { pasture ->
@@ -50,10 +70,27 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         PastureCollector.Events.PASTURE_COLLECTOR_TICKED.emit(PastureCollectorTickedEvent(chosenMon, this))
     }
 
+    /**
+     * Get nearby pasture blocks.
+     * Looks at 8 sides, up and down directions ignored
+     *
+     * @param level
+     * @return List of nearby pasture block entities
+     */
     fun getNearbyPastures(level: ServerLevel): List<PokemonPastureBlockEntity> {
         val positionsToCheck = mutableListOf<BlockPos>(
             pos.north(), pos.east(), pos.south(), pos.west()
         )
+
+        if (PastureCollector.config.checkDiagonal) {
+            positionsToCheck.addAll(
+                listOf(
+                    pos.north().west(), pos.north().east(),
+                    pos.south().west(), pos.south().east()
+                )
+            )
+        }
+
         val listOfNearbyPastures = mutableListOf<PokemonPastureBlockEntity>()
         for (positionToCheck in positionsToCheck) {
             val targetBlockState = level.getBlockState(positionToCheck)
@@ -66,50 +103,66 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     }
 
 
-    override fun getItems(): NonNullList<ItemStack> = items
+    override fun getItems(): NonNullList<ItemStack> = container.items
 
     override fun setItems(items: NonNullList<ItemStack>) {
-        this.items.clear()
-        this.items.addAll(items.take(CONTAINER_SIZE))
+        container.removeAllItems()
+        container.items.addAll(items.take(CONTAINER_SIZE))
     }
 
-    override fun createMenu(containerId: Int, inventory: Inventory): AbstractContainerMenu =
-        PastureCollectorMenu(containerId, inventory)
-
-    override fun getSlotsForFace(direction: Direction): IntArray = IntArray(PastureCollectorMenu.CONTAINER_SIZE)
-
-    fun putOrDropItem(stack: ItemStack) {
-        if (level !is ServerLevel) return
-        if (items.count { it.item != null && it.item != stack.item } == CONTAINER_SIZE) {
-            dropItemToLevel(stack)
-            return
-        }
-
-        var index = items.indexOfFirst { it.item == null || (it.item == stack.item) }
-        if (index == -1) index = 0
-        if (items[index].item != stack.item) {
-            items[index] = stack
-            return
-        }
-        while (items[index].count <= items[index].item.defaultMaxStackSize) {
-            items[index].grow(1)
-            stack.shrink(1)
-        }
-        if (stack.count > 0) {
-            putOrDropItem(stack)
-        }
-    }
-
-    fun dropItemToLevel(item: ItemStack) {
-        if (level !is ServerLevel) return
+    /**
+     * Drop item to level
+     *
+     * @param item the stack we want to drop
+     */
+    fun dropItemToLevel(item: ItemStack): PastureTickHandler.DropResult {
+        if (level !is ServerLevel) return PastureTickHandler.DropResult.NONE
         (level as ServerLevel).addFreshEntity(
             ItemEntity(
-                level,
+                level!!,
                 pos.x.toDouble(),
                 pos.y.plus(1).toDouble(),
                 pos.z.toDouble(),
                 item
             )
         )
+        return PastureTickHandler.DropResult.CONTAINER_FULL
+    }
+
+    fun handleDropPlacement(drop: ItemStack) {
+        var particle = ParticleTypes.CAMPFIRE_COSY_SMOKE
+
+        if (container.canAddItem(drop)) {
+            val remains = container.addItem(drop)
+
+            if (remains.isEmpty) {
+                particle = ParticleTypes.COMPOSTER
+            } else {
+                dropItemToLevel(remains)
+                particle = ParticleTypes.ASH
+            }
+
+        } else {
+            dropItemToLevel(drop)
+            particle = ParticleTypes.SMALL_FLAME
+        }
+
+        particle.let {
+            val posX = Random.nextDouble(PARTICLE_POS_XZ_RANDOMNESS_MIN, PARTICLE_POS_XZ_RANDOMNESS_MAX)
+            val posZ = Random.nextDouble(PARTICLE_POS_XZ_RANDOMNESS_MIN, PARTICLE_POS_XZ_RANDOMNESS_MAX)
+            level?.sendParticlesServer(
+                it,
+                pos.center.add(
+                    Vec3(
+                        posX,
+                        PARTICLE_POS_Y,
+                        posZ
+                    )
+                ),
+                PARTICLE_AMOUNT,
+                Vec3(0.0, PARTICLE_OFFSET_Y, 0.0),
+                0.0
+            )
+        }
     }
 }

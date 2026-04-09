@@ -1,5 +1,7 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.dropper
 
+import com.cobblemon.mod.common.pokemon.Pokemon
+import com.cobblemon.mod.common.util.toBlockPos
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
@@ -14,6 +16,7 @@ import us.timinc.mc.cobblemon.droploottables.api.Dropper
 import us.timinc.mc.cobblemon.droploottables.api.Dropper.Companion.CodecPieces
 import us.timinc.mc.cobblemon.droploottables.api.DropperType
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
 import kotlin.jvm.optionals.getOrNull
 
 class PastureDropper(
@@ -22,6 +25,8 @@ class PastureDropper(
     override val conditions: List<LootItemCondition>,
     override val dropTarget: ResourceLocation?
 ) : Dropper<PastureDropper.Context>() {
+    override fun getType(): DropperType<*, *> = PastureCollector.DropperTypes.PASTURE
+
     companion object {
         val CODEC: MapCodec<PastureDropper> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
@@ -42,10 +47,15 @@ class PastureDropper(
         val DROPPER_TYPE = DropperType(CODEC)
     }
 
-    class Context(override val level: ServerLevel, val collectorPos: BlockPos) : DropContext {
+    class Context(
+        override val level: ServerLevel,
+        val poke: Pokemon,
+        val collector: PastureCollectorBlockEntity
+    ) : DropContext {
         override fun toLootParams(): LootParams {
             val params = mutableMapOf<LootContextParam<out Any>, Any>(
-                LootContextParams.ORIGIN to collectorPos,
+                LootContextParams.ORIGIN to poke.entity!!.position().toBlockPos(),
+                LootContextParams.THIS_ENTITY to collector.pos
             )
 
             return LootParams(
@@ -56,6 +66,4 @@ class PastureDropper(
             )
         }
     }
-
-    override fun getType(): DropperType<*, *> = PastureCollector.DropperTypes.PASTURE
 }

@@ -4,9 +4,9 @@ import net.minecraft.world.item.ItemStack
 import us.timinc.mc.cobblemon.droploottables.api.DropTarget
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
 
-class PastureCollectorWorldPositionTarget(val blockEntity: PastureCollectorBlockEntity) : DropTarget {
+class PastureCollectorWorldPositionTarget(val collector: PastureCollectorBlockEntity) : DropTarget {
     override fun dropTo(stack: ItemStack): ItemStack {
-        blockEntity.dropItemToLevel(stack)
+        collector.handleDropPlacement(stack)
         return ItemStack.EMPTY
     }
 }

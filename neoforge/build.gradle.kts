@@ -1,27 +1,26 @@
 plugins {
     id("dev.architectury.loom")
     id("architectury-plugin")
-    id("com.gradleup.shadow") version ("9.2.2")
+    id("com.gradleup.shadow")
 }
 
 architectury {
     platformSetupLoomIde()
     neoForge()
 }
+
 loom {
-    silentMojangMappingsLicense()
     enableTransitiveAccessWideners.set(true)
+    silentMojangMappingsLicense()
 }
 
 val shadowCommon: Configuration by configurations.creating
 
 repositories {
     mavenCentral()
-    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-    maven("https://maven.impactdev.net/repository/development/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
+    maven("https://maven.neoforged.net/releases/")
     maven("https://thedarkcolour.github.io/KotlinForForge/")
-    maven("https://maven.neoforged.net")
 }
 
 dependencies {
@@ -29,7 +28,7 @@ dependencies {
     mappings(loom.officialMojangMappings())
     neoForge("net.neoforged:neoforge:${property("neoforge_version")}")
 
-    modImplementation("com.cobblemon:neoforge:${property("cobblemon_version")}") { isTransitive = false }
+    modImplementation("com.cobblemon:neoforge:${property("cobblemon_version")}")
     //Needed for cobblemon
     forgeRuntimeLibrary("thedarkcolour:kotlinforforge-neoforge:${property("kotlin_for_forge_version")}") {
         exclude("net.neoforged.fancymodloader", "loader")
@@ -39,7 +38,7 @@ dependencies {
     "developmentNeoForge"(project(":common", configuration = "namedElements")) {
         isTransitive = false
     }
-    shadowBundle(project(":common", configuration = "transformProductionNeoForge"))
+    shadowCommon(project(":common", configuration = "transformProductionNeoForge"))
 
     modImplementation("maven.modrinth:cobblemon-tim-core:${property("tim_core_neoforge_version")}")
     modImplementation("maven.modrinth:cobblemon-droploottables:${property("droploottables_neoforge_version")}")
@@ -51,12 +50,12 @@ dependencies {
 
 
 tasks {
-    getByName<Test>("test") {
-        useJUnitPlatform()
-    }
+    processResources {
+        inputs.property("version", project.version)
 
-    filesMatching("META-INF/neoforge.mods.toml") {
-        expand(project.properties)
+        filesMatching("META-INF/neoforge.mods.toml") {
+            expand(project.properties)
+        }
     }
 
     jar {
@@ -65,25 +64,21 @@ tasks {
     }
 
     shadowJar {
+        exclude("fabric.mod.json")
+        archiveClassifier.set("dev-shadow")
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
         configurations = listOf(shadowCommon)
-
-        archiveBaseName.set("${rootProject.name}-${project.name}")
-        archiveVersion.set("${project.version}")
-        archiveClassifier.set("shadow")
     }
 
     remapJar {
-        injectAccessWidener = true
         dependsOn(shadowJar)
         inputFile.set(shadowJar.flatMap { it.archiveFile })
-
-        archiveBaseName.set("${rootProject.name}-${project.name}")
-        archiveVersion.set("${project.version}")
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
+        archiveVersion.set("${rootProject.version}")
     }
 
     remapSourcesJar {
-        archiveBaseName.set("${rootProject.name}-${project.name}")
-        archiveVersion.set("${project.version}")
-        archiveClassifier.set("sources")
+        archiveBaseName.set("${rootProject.property("archives_base_name")}-${project.name}")
+        archiveVersion.set("${rootProject.version}")
     }
 }

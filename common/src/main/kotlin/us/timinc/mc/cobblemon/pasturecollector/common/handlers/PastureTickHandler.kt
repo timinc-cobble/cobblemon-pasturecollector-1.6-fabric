@@ -21,6 +21,7 @@ import kotlin.random.Random
 
 object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, PastureCollectorTickedEvent> {
     enum class DropResult {
+        CLIENT,
         FULL,
         PARTIAL,
         NONE,
@@ -33,7 +34,6 @@ object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, 
     const val PARTICLE_POS_Y = 0.65
     const val PARTICLE_POS_XZ_RANDOMNESS_MIN = -0.15
     const val PARTICLE_POS_XZ_RANDOMNESS_MAX = 0.15
-
 
     override val dropperTypeId: ResourceLocation = PastureCollector.DataKeys.DropperTypes.PASTURE
 
@@ -52,7 +52,8 @@ object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, 
 
     override fun getContext(evt: PastureCollectorTickedEvent) = PastureDropper.Context(
         evt.collector.level as ServerLevel,
-        evt.collector.pos,
+        evt.pokemon,
+        evt.collector
     )
 
     override fun getLevel(evt: PastureCollectorTickedEvent): ServerLevel? = evt.collector.level as? ServerLevel
@@ -71,36 +72,6 @@ object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, 
                 return@mapNotNull ItemStack(item, drop.quantityRange?.random() ?: drop.quantity)
             }
             return@mapNotNull null
-        }
-    }
-
-    override fun handle(evt: PastureCollectorTickedEvent) {
-        super.handle(evt)
-        val particle = ParticleTypes.CAMPFIRE_COSY_SMOKE
-
-//        when (evt.collector) {
-//            DropResult.NO_DROP -> null
-//            DropResult.NONE -> ParticleTypes.ASH
-//            DropResult.PARTIAL ->
-//            DropResult.FULL -> ParticleTypes.COMPOSTER
-//            DropResult.CONTAINER_FULL -> ParticleTypes.SMALL_FLAME
-//        }
-        particle.let {
-            val posX = Random.nextDouble(PARTICLE_POS_XZ_RANDOMNESS_MIN, PARTICLE_POS_XZ_RANDOMNESS_MAX)
-            val posZ = Random.nextDouble(PARTICLE_POS_XZ_RANDOMNESS_MIN, PARTICLE_POS_XZ_RANDOMNESS_MAX)
-            getLevel(evt)?.sendParticlesServer(
-                it,
-                evt.collector.pos.center.add(
-                    Vec3(
-                        posX,
-                        PARTICLE_POS_Y,
-                        posZ
-                    )
-                ),
-                PARTICLE_AMOUNT,
-                Vec3(0.0, PARTICLE_OFFSET_Y, 0.0),
-                0.0
-            )
         }
     }
 }

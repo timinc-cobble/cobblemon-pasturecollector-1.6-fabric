@@ -1,9 +1,7 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.blocks
 
-import com.cobblemon.mod.common.util.sendParticlesServer
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
 import net.minecraft.world.Containers
@@ -16,46 +14,40 @@ import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
-import us.timinc.mc.cobblemon.pasturecollector.common.event.PastureCollectorTickedEvent
 import us.timinc.mc.cobblemon.pasturecollector.common.exceptions.PastureCollectorEntityNotFound
-import us.timinc.mc.cobblemon.pasturecollector.common.extensions.Shapes16
-import kotlin.random.Random
-import kotlin.random.Random.Default.nextFloat
+import us.timinc.mc.cobblemon.pasturecollector.common.extensions.box16
 
 class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties) {
     companion object {
         val CODEC: MapCodec<PastureCollectorBlock> = simpleCodec(::PastureCollectorBlock)
 
         val SHAPE: VoxelShape = Shapes.or(
-            Shapes16.box(
+            box16(
                 0, 0, 0,
                 16, 12, 16
             ),
-
-            Shapes16.box(
+            box16(
                 0, 12, 0,
                 2, 14, 2
             ),
-            Shapes16.box(
+            box16(
                 14, 12, 0,
                 16, 14, 2
             ),
-            Shapes16.box(
+            box16(
                 0, 12, 14,
                 2, 14, 16
             ),
-            Shapes16.box(
+            box16(
                 14, 12, 14,
                 16, 14, 16
             ),
-
-            Shapes16.box(
+            box16(
                 0, 14, 0,
                 16, 16, 16
             ),

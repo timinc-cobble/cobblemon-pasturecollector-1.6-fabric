@@ -1,0 +1,45 @@
+modLoader = "kotlinforforge"
+loaderVersion = "[4,)"
+license = "MIT"
+issueTrackerURL="${modIssues}"
+
+[[mods]]
+modId = "${modId}"
+version = "${modCobblemonVersion}-neoforge-${modMyVersion}"
+displayName = "${modName}"
+authors = "${modAuthor}"
+description = "${modDescription}"
+logoFile="${modId}_small.png"
+displayUrl="${modDiscord}"
+modUrl="${modSource}"
+
+[[mixins]]
+config = "mixins.droploottables.json"
+
+[[dependencies.${modId}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${minecraft_version}]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${modId}]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${modId}]]
+modId = "cobblemon"
+mandatory = true
+versionRange = "[${cobblemon_version}]"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.${modId}]]
+modId = "tim_core"
+mandatory = true
+versionRange = "[${tim_core_neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"

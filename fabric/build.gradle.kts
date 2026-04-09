@@ -1,7 +1,7 @@
 plugins {
     id("dev.architectury.loom")
     id("architectury-plugin")
-    id("com.gradleup.shadow") version ("9.2.2")
+    id("com.gradleup.shadow")
 }
 
 architectury {

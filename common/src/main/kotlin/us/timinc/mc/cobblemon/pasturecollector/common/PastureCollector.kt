@@ -30,6 +30,7 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
 ) {
     class PastureCollectorConfig : AbstractConfig() {
         val baseCobblemonLootEnabled: Boolean = true
+        val checkDiagonal: Boolean = false
         val chanceToDrop: Float = 1F
         val pastureDropTargets: List<String> = listOf(
             "pasture_collector_storage",
@@ -62,7 +63,6 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
         object Menu {
             val PASTURE_COLLECTOR_MENU: MenuType<PastureCollectorMenu> =
                 MenuType.register("pasture_collector", ::PastureCollectorMenu)
-
         }
     }
 

@@ -3,11 +3,19 @@ plugins {
     id("java-library")
     kotlin("jvm") version("2.2.20")
 
-    id("dev.architectury.loom") version("1.11-SNAPSHOT") apply false
+    id("dev.architectury.loom") version("1.14-SNAPSHOT") apply false
     id("architectury-plugin") version("3.4-SNAPSHOT") apply false
+
+    id("com.gradleup.shadow") version ("9.2.2") apply false
 }
 
 allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
     apply(plugin = "java")
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
@@ -15,16 +23,8 @@ allprojects {
     group = project.property("maven_group")!!
 
     repositories {
-        mavenCentral()
-        maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/")
-        maven("https://maven.impactdev.net/repository/development/")
-        maven("https://maven.neoforged.net/releases")
-        maven("https://thedarkcolour.github.io/KotlinForForge/")
+        maven("https://artefacts.cobblemon.com/releases/")
         maven("https://api.modrinth.com/maven")
-    }
-
-    tasks.getByName<Test>("test") {
-        useJUnitPlatform()
     }
 
     java {
