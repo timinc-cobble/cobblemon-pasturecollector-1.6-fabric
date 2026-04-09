@@ -75,11 +75,8 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         super.randomTick(state, level, pos, random)
         PastureCollector.debugger.debug("random tick", true)
         val check = random.nextFloat()
-//        if (check >= PastureCollector.config.chanceToDrop) return
+        if (check >= PastureCollector.config.chanceToDrop) return
         getBlockEntity(pos, level).attemptToGetDrop()
-        PastureCollector.debugger.debug("$check", true)
-        PastureCollector.debugger.debug("${PastureCollector.config.chanceToDrop}", true)
-        PastureCollector.debugger.debug("random tick::chance to drop checked", true)
     }
 
     override fun useWithoutItem(
