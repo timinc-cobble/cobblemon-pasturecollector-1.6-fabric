@@ -53,7 +53,6 @@ object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, 
     override fun getContext(evt: PastureCollectorTickedEvent) = PastureDropper.Context(
         evt.collector.level as ServerLevel,
         evt.pokemon,
-        evt.collector
     )
 
     override fun getLevel(evt: PastureCollectorTickedEvent): ServerLevel? = evt.collector.level as? ServerLevel

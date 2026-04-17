@@ -50,12 +50,12 @@ class PastureDropper(
     class Context(
         override val level: ServerLevel,
         val poke: Pokemon,
-        val collector: PastureCollectorBlockEntity
     ) : DropContext {
         override fun toLootParams(): LootParams {
+            val entity = poke.entity ?: throw Exception("Cannot form a Pasture context without a valid Pokémon entity.")
             val params = mutableMapOf<LootContextParam<out Any>, Any>(
-                LootContextParams.ORIGIN to poke.entity!!.position().toBlockPos(),
-                LootContextParams.THIS_ENTITY to collector.pos
+                LootContextParams.ORIGIN to entity.position().toBlockPos(),
+                LootContextParams.THIS_ENTITY to entity,
             )
 
             return LootParams(
