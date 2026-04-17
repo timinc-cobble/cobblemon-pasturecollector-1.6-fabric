@@ -2,13 +2,10 @@ package us.timinc.mc.cobblemon.pasturecollector.common.handlers
 
 import com.cobblemon.mod.common.api.drop.ItemDropEntry
 import com.cobblemon.mod.common.util.asIdentifierDefaultingNamespace
-import com.cobblemon.mod.common.util.sendParticlesServer
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.phys.Vec3
 import us.timinc.mc.cobblemon.droploottables.api.DropHandler
 import us.timinc.mc.cobblemon.droploottables.api.DropTarget
 import us.timinc.mc.cobblemon.pasturecollector.common.MOD_ID
@@ -17,7 +14,6 @@ import us.timinc.mc.cobblemon.pasturecollector.common.dropper.PastureDropper
 import us.timinc.mc.cobblemon.pasturecollector.common.droptarget.PastureCollectorStorageTarget
 import us.timinc.mc.cobblemon.pasturecollector.common.droptarget.PastureCollectorWorldPositionTarget
 import us.timinc.mc.cobblemon.pasturecollector.common.event.PastureCollectorTickedEvent
-import kotlin.random.Random
 
 object PastureTickHandler : DropHandler<PastureDropper.Context, PastureDropper, PastureCollectorTickedEvent> {
     enum class DropResult {

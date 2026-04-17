@@ -52,6 +52,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
         val res = IntArray(CONTAINER_SIZE) { it }
         return res
     }
+
     override fun canPlaceItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction?): Boolean = false
     override fun canTakeItemThroughFace(i: Int, itemStack: ItemStack, direction: Direction): Boolean = true
     override fun getItem(i: Int): ItemStack = items[i]
@@ -60,7 +61,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     }
 
     override fun canTakeItem(container: Container, i: Int, itemStack: ItemStack): Boolean {
-        return  i in 0..<CONTAINER_SIZE
+        return i in 0..<CONTAINER_SIZE
     }
 
     override fun getItems(): NonNullList<ItemStack> = items
