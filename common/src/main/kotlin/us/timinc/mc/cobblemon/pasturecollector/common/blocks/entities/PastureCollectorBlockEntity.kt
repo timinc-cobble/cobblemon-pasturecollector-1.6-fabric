@@ -141,6 +141,9 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     }
 
     fun handleDropPlacement(drop: ItemStack) {
+        // TODO: This should be handled in DLT. If the drop is empty, it shouldn't try and drop it.
+        if (drop.isEmpty) return
+
         var particle: SimpleParticleType
 
         if (canAddItem(drop)) {
