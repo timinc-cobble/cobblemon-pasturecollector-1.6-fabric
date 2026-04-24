@@ -10,12 +10,11 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import us.timinc.mc.cobblemon.droploottables.DropLootTables
-import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Events.PASTURE_COLLECTOR_TICKED
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Registries.Block.PASTURE_COLLECTOR
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.PastureCollectorBlock
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
 import us.timinc.mc.cobblemon.pasturecollector.common.dropper.PastureDropper
-import us.timinc.mc.cobblemon.pasturecollector.common.event.PastureCollectorTickedEvent
+import us.timinc.mc.cobblemon.pasturecollector.common.event.PasturePokemonTickedEvent
 import us.timinc.mc.cobblemon.pasturecollector.common.handlers.PastureTickHandler
 import us.timinc.mc.cobblemon.pasturecollector.common.inventory.PastureCollectorMenu
 import us.timinc.mc.cobblemon.timcore.AbstractConfig
@@ -29,13 +28,35 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
     PastureCollectorConfig::class.java
 ) {
     class PastureCollectorConfig : AbstractConfig() {
+        companion object {
+            @Suppress("unused")
+            enum class TickType {
+                TICK, // On every tick of the block entity.
+                RANDOM_TICK, // On random tick of the block entity. Like wheat.
+            }
+
+            @Suppress("unused")
+            enum class TargetMon {
+                ALL, // Every mon in all the nearby pastures gets a chance to drop at the same time.
+                RANDOM, // A random mon in all the nearby pastures gets a chance to drop.
+            }
+
+            enum class IntervalType {
+                PER_POKEMON,
+                PER_DROPPER,
+            }
+        }
+
         val baseCobblemonLootEnabled: Boolean = true
         val checkDiagonal: Boolean = false
         val chanceToDrop: Float = 1F
         val pastureDropTargets: List<String> = listOf(
-            "pasture_collector_storage",
-            "pasture_collector_world_position"
+            "pasturecollector:pasture_collector_storage"
         )
+        val tickType: TickType = TickType.RANDOM_TICK
+        val targetMon: TargetMon = TargetMon.RANDOM
+        val blockTickInterval: Int = 0
+        val playCryOnDrop: Boolean = false
     }
 
     object Registries {
@@ -85,7 +106,7 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
     }
 
     object Events {
-        val PASTURE_COLLECTOR_TICKED = EventObservable<PastureCollectorTickedEvent>()
+        val PASTURE_COLLECTOR_TICKED = EventObservable<PasturePokemonTickedEvent>()
     }
 
     init {
@@ -96,6 +117,6 @@ object PastureCollector : AbstractMod<PastureCollector.PastureCollectorConfig>(
         @Suppress("UnusedExpression")
         Registries.Menu
 
-        PASTURE_COLLECTOR_TICKED.subscribe(Priority.LOWEST, PastureTickHandler::handle)
+        Events.PASTURE_COLLECTOR_TICKED.subscribe(Priority.NORMAL, PastureTickHandler::handle)
     }
 }

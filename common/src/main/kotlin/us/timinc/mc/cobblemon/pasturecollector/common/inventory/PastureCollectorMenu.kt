@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.Registries.Menu.PASTURE_COLLECTOR_MENU
+import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity.Companion.CONTAINER_SIZE
 
 class PastureCollectorMenu(syncId: Int, playerInventory: Inventory, val container: Container) :
@@ -23,9 +24,9 @@ class PastureCollectorMenu(syncId: Int, playerInventory: Inventory, val containe
     init {
         container.startOpen(playerInventory.player)
 
+        addBlockInventory()
         addPlayerInventory(playerInventory)
         addPlayerHotbar(playerInventory)
-        addBlockInventory()
     }
 
     override fun stillValid(player: Player): Boolean = container.stillValid(player)
@@ -72,20 +73,25 @@ class PastureCollectorMenu(syncId: Int, playerInventory: Inventory, val containe
         var itemStack = ItemStack.EMPTY
         val slot = this.slots[slotIndex]
 
-        if (slot.container !is SimpleContainer) return itemStack
         if (!slot.hasItem()) return itemStack
+        if (slot.container !is PastureCollectorBlockEntity) return itemStack
 
-        val slotStack = slot.item
-        itemStack = slotStack.copy()
-        if (slotIndex < CONTAINER_SIZE) {
-            if (!this.moveItemStackTo(slotStack, CONTAINER_SIZE, this.slots.size, true)) {
-                return ItemStack.EMPTY
+        itemStack = slot.item.copy()
+        when (slotIndex >= CONTAINER_SIZE) {
+            true -> {
+                if (!this.moveItemStackTo(slot.item, 0, CONTAINER_SIZE - 1, true)) {
+                    return ItemStack.EMPTY
+                }
             }
-        } else if (!this.moveItemStackTo(slotStack, 0, CONTAINER_SIZE, false)) {
-            return ItemStack.EMPTY
+
+            false -> {
+                if (!this.moveItemStackTo(slot.item, CONTAINER_SIZE, this.slots.size, true)) {
+                    return ItemStack.EMPTY
+                }
+            }
         }
 
-        if (slotStack.isEmpty) {
+        if (slot.item.isEmpty) {
             slot.setByPlayer(ItemStack.EMPTY)
         } else {
             slot.setChanged()

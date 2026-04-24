@@ -1,7 +1,8 @@
 package us.timinc.mc.cobblemon.pasturecollector.common.dropper
 
-import com.cobblemon.mod.common.pokemon.Pokemon
+import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
 import com.cobblemon.mod.common.util.toBlockPos
+import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.resources.ResourceLocation
@@ -21,7 +22,8 @@ class PastureDropper(
     override val trigger: ResourceLocation,
     override val lootTables: List<ResourceLocation>,
     override val conditions: List<LootItemCondition>,
-    override val dropTarget: ResourceLocation?
+    override val dropTarget: ResourceLocation?,
+    val interval: Int,
 ) : Dropper<PastureDropper.Context>() {
     override fun getType(): DropperType<*, *> = PastureCollector.DropperTypes.PASTURE
 
@@ -32,12 +34,14 @@ class PastureDropper(
                 CodecPieces.getTables(PastureDropper::lootTables),
                 CodecPieces.getConditions(PastureDropper::conditions),
                 CodecPieces.getDropTarget(PastureDropper::dropTarget),
-            ).apply(instance) { trigger, lootTables, conditions, dropTarget ->
+                Codec.INT.fieldOf("ticks").forGetter(PastureDropper::interval),
+            ).apply(instance) { trigger, lootTables, conditions, dropTarget, ticks ->
                 PastureDropper(
                     trigger,
                     lootTables,
                     conditions,
-                    dropTarget.getOrNull()
+                    dropTarget.getOrNull(),
+                    ticks
                 )
             }
         }
@@ -47,13 +51,12 @@ class PastureDropper(
 
     class Context(
         override val level: ServerLevel,
-        val poke: Pokemon,
+        val pokemonEntity: PokemonEntity,
     ) : DropContext {
         override fun toLootParams(): LootParams {
-            val entity = poke.entity ?: throw Exception("Cannot form a Pasture context without a valid Pokémon entity.")
             val params = mutableMapOf<LootContextParam<out Any>, Any>(
-                LootContextParams.ORIGIN to entity.position().toBlockPos(),
-                LootContextParams.THIS_ENTITY to entity,
+                LootContextParams.ORIGIN to pokemonEntity.position().toBlockPos(),
+                LootContextParams.THIS_ENTITY to pokemonEntity,
             )
 
             return LootParams(
@@ -64,4 +67,9 @@ class PastureDropper(
             )
         }
     }
+
+    override fun canDrop(context: Context): Boolean =
+        !context.pokemonEntity.isBusy
+                && context.pokemonEntity.ticksLived % interval == 0
+                && super.canDrop(context)
 }

@@ -12,12 +12,15 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.BaseEntityBlock
 import net.minecraft.world.level.block.RenderShape
 import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityTicker
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector
+import us.timinc.mc.cobblemon.pasturecollector.common.PastureCollector.PastureCollectorConfig.Companion.TickType
 import us.timinc.mc.cobblemon.pasturecollector.common.blocks.entities.PastureCollectorBlockEntity
 import us.timinc.mc.cobblemon.pasturecollector.common.exceptions.PastureCollectorEntityNotFound
 import us.timinc.mc.cobblemon.pasturecollector.common.extensions.box16
@@ -66,6 +69,16 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         collisionContext: CollisionContext,
     ): VoxelShape = SHAPE
 
+    override fun <T : BlockEntity?> getTicker(
+        level: Level,
+        blockState: BlockState,
+        blockEntityType: BlockEntityType<T?>
+    ): BlockEntityTicker<T?>? = if (level !is ServerLevel) null else createTickerHelper(
+        blockEntityType,
+        PastureCollector.Registries.Entity.PASTURE_COLLECTOR_BLOCK_ENTITY,
+        PastureCollectorBlockEntity.TICKER::tick
+    )
+
     override fun randomTick(
         state: BlockState,
         level: ServerLevel,
@@ -73,10 +86,8 @@ class PastureCollectorBlock(properties: Properties) : BaseEntityBlock(properties
         random: RandomSource,
     ) {
         super.randomTick(state, level, pos, random)
-        PastureCollector.debugger.debug("random tick", true)
-        val check = random.nextFloat()
-        if (check >= PastureCollector.config.chanceToDrop) return
-        getBlockEntity(pos, level).attemptToGetDrop()
+        if (PastureCollector.config.tickType != TickType.RANDOM_TICK) return
+        getBlockEntity(pos, level).intervalRep()
     }
 
     override fun useWithoutItem(
