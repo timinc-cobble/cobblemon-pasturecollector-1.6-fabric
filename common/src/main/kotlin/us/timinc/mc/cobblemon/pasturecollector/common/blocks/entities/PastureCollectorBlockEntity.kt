@@ -53,7 +53,7 @@ class PastureCollectorBlockEntity(val pos: BlockPos, state: BlockState) :
     private var items = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY)
     private var lastIntervalRep: Long = 0
 
-    override fun getDefaultName(): Component = Component.translatable("pasture_collector.container.pasture_collector")
+    override fun getDefaultName(): Component = Component.translatable("pasturecollector.container.pasture_collector")
     override fun getContainerSize(): Int = CONTAINER_SIZE
     override fun getSlotsForFace(direction: Direction): IntArray = IntArray(CONTAINER_SIZE) { it }
 

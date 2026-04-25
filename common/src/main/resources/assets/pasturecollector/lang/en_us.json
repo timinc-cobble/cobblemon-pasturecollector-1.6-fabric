@@ -1,3 +1,4 @@
 {
-  "pasturecollector.container.pasture_collector": "Pasture Bin"
+  "pasturecollector.container.pasture_collector": "Pasture Bin",
+  "block.pasturecollector.pasture_collector": "Pasture Bin"
 }
